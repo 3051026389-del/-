@@ -1,0 +1,4640 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>回声 ECHO</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; }
+
+  body {
+    --c-bg: #04060c;
+    --c-overlay: rgba(4,6,12,.94);
+    --c-text: #dce8ff;
+    --c-text-bright: #ffffff;
+    --c-text-sub: #7f9dd0;
+    --c-text-dim: #5b76a8;
+    --c-card-bg: rgba(255,255,255,.035);
+    --c-card-border: rgba(255,255,255,.07);
+    --c-card-hover: rgba(255,255,255,.07);
+    --c-drawer-bg: linear-gradient(180deg, #0a1020, #060a15);
+    --c-drawer-border: rgba(95,168,255,.2);
+    --c-input-bg: rgba(255,255,255,.045);
+    --c-input-border: rgba(255,255,255,.09);
+    --c-btn-ghost-bg: rgba(255,255,255,.05);
+    --c-btn-ghost-border: rgba(255,255,255,.13);
+    --c-btn-ghost-text: #9fb6dd;
+    --c-icon-bg: rgba(255,255,255,.045);
+    --c-icon-border: rgba(255,255,255,.09);
+    --c-time-shadow: 0 0 22px rgba(90,160,255,.75);
+    --c-title-top: #ffffff;
+    --c-title-bottom: #4f9dff;
+    --c-notice-bg: rgba(255,200,60,.06);
+    --c-notice-border: rgba(255,200,60,.18);
+    --c-notice-text: #a89050;
+    --c-panel-solid: rgba(10,16,32,.78);
+
+    background: var(--c-bg);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--c-text);
+    user-select: none; -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+    transition: background-color .35s;
+  }
+
+  body.theme-light {
+    --c-bg: #eef2f9;
+    --c-overlay: rgba(238,242,249,.96);
+    --c-text: #1c2b48;
+    --c-text-bright: #0d1b33;
+    --c-text-sub: #4a5f85;
+    --c-text-dim: #7a8aa8;
+    --c-card-bg: rgba(20,40,80,.05);
+    --c-card-border: rgba(20,40,80,.13);
+    --c-card-hover: rgba(20,40,80,.1);
+    --c-drawer-bg: linear-gradient(180deg, #ffffff, #eef2f9);
+    --c-drawer-border: rgba(37,99,235,.25);
+    --c-input-bg: rgba(20,40,80,.05);
+    --c-input-border: rgba(20,40,80,.15);
+    --c-btn-ghost-bg: rgba(20,40,80,.05);
+    --c-btn-ghost-border: rgba(20,40,80,.15);
+    --c-btn-ghost-text: #4a5f85;
+    --c-icon-bg: rgba(20,40,80,.05);
+    --c-icon-border: rgba(20,40,80,.13);
+    --c-time-shadow: 0 0 18px rgba(37,99,235,.25);
+    --c-title-top: #1a3a6e;
+    --c-title-bottom: #2563eb;
+    --c-notice-bg: rgba(200,140,0,.09);
+    --c-notice-border: rgba(200,140,0,.25);
+    --c-notice-text: #8a6410;
+    --c-panel-solid: rgba(255,255,255,.85);
+  }
+
+  body.theme-gray {
+    --c-bg: #1a1e24;
+    --c-overlay: rgba(26,30,36,.94);
+    --c-text: #b0b8c4;
+    --c-text-bright: #d2d8e0;
+    --c-text-sub: #7a828e;
+    --c-text-dim: #58606c;
+    --c-card-bg: rgba(255,255,255,.028);
+    --c-card-border: rgba(255,255,255,.058);
+    --c-card-hover: rgba(255,255,255,.055);
+    --c-drawer-bg: linear-gradient(180deg, #1e2229, #16191f);
+    --c-drawer-border: rgba(120,140,180,.13);
+    --c-input-bg: rgba(255,255,255,.032);
+    --c-input-border: rgba(255,255,255,.075);
+    --c-btn-ghost-bg: rgba(255,255,255,.035);
+    --c-btn-ghost-border: rgba(255,255,255,.09);
+    --c-btn-ghost-text: #7a828e;
+    --c-icon-bg: rgba(255,255,255,.032);
+    --c-icon-border: rgba(255,255,255,.065);
+    --c-time-shadow: 0 0 12px rgba(100,120,160,.2);
+    --c-title-top: #aab2be;
+    --c-title-bottom: #5a6a88;
+    --c-notice-bg: rgba(140,120,70,.055);
+    --c-notice-border: rgba(140,120,70,.14);
+    --c-notice-text: #7a7060;
+    --c-panel-solid: rgba(26,30,36,.85);
+  }
+
+  body.theme-gray canvas {
+    filter: saturate(0.7) brightness(0.78) contrast(0.94);
+  }
+  body.theme-gray .item-icon,
+  body.theme-gray .link-icon,
+  body.theme-gray .account-avatar,
+  body.theme-gray .match-avatar,
+  body.theme-gray .pause-icon {
+    filter: saturate(0.72) brightness(0.86);
+  }
+  body.theme-gray .icon-btn,
+  body.theme-gray .hunter-skin-btn {
+    filter: saturate(0.72) brightness(0.86);
+  }
+
+  canvas { display: block; position: fixed; inset: 0; }
+
+  .hud {
+    position: fixed; top: 0; left: 0; right: 0;
+    padding: 18px 22px;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    pointer-events: none; z-index: 10;
+  }
+  .hud-right {
+    display: flex; flex-direction: column;
+    align-items: flex-end; gap: 7px;
+    padding-right: 52px;
+  }
+  .time {
+    font-size: 40px; font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 1px; line-height: 1;
+    color: var(--c-text-bright);
+    text-shadow: var(--c-time-shadow);
+    transition: color .3s;
+  }
+  .time span { font-size: 16px; font-weight: 600; color: var(--c-text-sub); margin-left: 2px; }
+
+  .sub { font-size: 12px; color: var(--c-text-sub); letter-spacing: 1px; }
+  .sub b { color: #5ef0d8; font-weight: 700; }
+  .sub i { color: #ff6b6b; font-weight: 700; font-style: normal; }
+  body.theme-gray .sub b { color: #6ac0b0; }
+  body.theme-gray .sub i { color: #c07070; }
+  .token-line { color: #ffd54a; }
+  .token-line b { color: #ffd54a; font-weight: 800; }
+  body.theme-gray .token-line,
+  body.theme-gray .token-line b { color: #c0b070; }
+
+  .hunt-hud { display: none; }
+  .hunt-hud.show { display: flex; }
+  .hunt-hud .time.low {
+    color: #ff5b5b;
+    text-shadow: 0 0 22px rgba(255,80,80,.85);
+    animation: huntLowPulse .7s ease-in-out infinite alternate;
+  }
+  @keyframes huntLowPulse {
+    from { opacity: 1; }
+    to   { opacity: .55; }
+  }
+  .hunt-score-line { color: #ffd54a; }
+  .hunt-score-line b {
+    color: #ffd54a; font-weight: 800; font-size: 14px;
+    text-shadow: 0 0 12px rgba(255,200,60,.5);
+  }
+
+  .match-target-hud {
+    display: none;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: #ffb84d;
+    padding: 3px 10px;
+    background: rgba(255,184,77,.1);
+    border: 1px solid rgba(255,184,77,.3);
+    border-radius: 999px;
+  }
+  .match-target-hud.show { display: inline-flex; align-items: center; gap: 5px; }
+  .match-target-hud b { color: #ffd54a; font-weight: 800; font-size: 13px; }
+
+  .pause-btn {
+    position: fixed; top: 18px; right: 22px;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    border: 1.5px solid var(--c-card-border);
+    background: var(--c-card-bg);
+    color: var(--c-btn-ghost-text);
+    font-size: 13px; letter-spacing: 1px;
+    font-family: inherit;
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0; line-height: 1;
+    transition: all .18s;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    z-index: 20;
+  }
+  .pause-btn:hover { background: var(--c-card-hover); color: var(--c-text-bright); }
+  .pause-btn:active { transform: scale(.9); }
+
+  .quick-bar {
+    position: fixed;
+    bottom: 22px;
+    left: 22px;
+    display: none;
+    gap: 10px;
+    padding: 8px;
+    background: var(--c-panel-solid);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border: 1.5px solid rgba(95,168,255,.22);
+    border-radius: 20px;
+    z-index: 30;
+    box-shadow: 0 10px 32px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.05);
+    max-width: calc(100vw - 44px);
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  .quick-bar.show { display: flex; }
+  .quick-bar::-webkit-scrollbar { height: 0; }
+
+  .quick-btn {
+    position: relative;
+    width: 54px; height: 54px;
+    border-radius: 15px;
+    border: 1.5px solid rgba(95,168,255,.32);
+    background: rgba(95,168,255,.1);
+    color: inherit;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    line-height: 1;
+    padding: 0;
+    transition: all .16s cubic-bezier(.3,1.4,.5,1);
+    flex-shrink: 0;
+  }
+  .quick-btn:hover:not(:disabled) {
+    background: rgba(95,168,255,.25);
+    border-color: #5fa8ff;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 22px rgba(80,150,255,.4), 0 0 18px rgba(95,168,255,.35);
+  }
+  .quick-btn:active:not(:disabled) { transform: translateY(-1px) scale(.93); }
+  .quick-btn:disabled { opacity: .35; cursor: not-allowed; filter: grayscale(.6); }
+  body.theme-gray .quick-btn {
+    background: rgba(80,110,160,.08);
+    border-color: rgba(80,110,160,.22);
+  }
+  .quick-btn .qb-n {
+    position: absolute;
+    top: -7px; right: -7px;
+    font-size: 11px; font-weight: 800;
+    color: #04060c;
+    background: #5fa8ff;
+    min-width: 20px; height: 20px;
+    border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 5px;
+    box-shadow: 0 0 12px rgba(95,168,255,.75);
+    letter-spacing: 0;
+  }
+  body.theme-gray .quick-btn .qb-n {
+    background: #6a8ab0;
+    box-shadow: 0 0 10px rgba(100,140,190,.6);
+  }
+  .quick-btn .qb-name {
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    color: var(--c-text-sub);
+    letter-spacing: .5px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .15s;
+  }
+  .quick-btn:hover .qb-name { opacity: 1; }
+
+  @keyframes qbFlash {
+    0%   { box-shadow: 0 0 0 0 rgba(95,168,255,.7); }
+    100% { box-shadow: 0 0 0 22px rgba(95,168,255,0); }
+  }
+  .quick-btn.flash { animation: qbFlash .55s ease-out; }
+
+  .menu-toggle {
+    position: fixed;
+    left: 0; top: 50%;
+    transform: translateY(-50%);
+    width: 34px; height: 74px;
+    border-radius: 0 14px 14px 0;
+    border: 1.5px solid rgba(95,168,255,.3);
+    border-left: none;
+    background: rgba(20,32,58,.78);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    color: #7fb0ff;
+    font-size: 17px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+    z-index: 95;
+    transition: all .22s;
+    box-shadow: 2px 0 18px rgba(0,0,0,.4);
+  }
+  .menu-toggle:hover {
+    background: rgba(30,50,90,.92);
+    color: #a8c8ff;
+    width: 40px;
+    box-shadow: 4px 0 26px rgba(80,150,255,.28);
+  }
+  .menu-toggle:active { transform: translateY(-50%) scale(.94); }
+  body.theme-light .menu-toggle {
+    background: rgba(255,255,255,.85);
+    color: #2563eb;
+    border-color: rgba(37,99,235,.3);
+    box-shadow: 2px 0 18px rgba(0,0,0,.1);
+  }
+  body.theme-light .menu-toggle:hover { background: #ffffff; color: #1a3a6e; }
+  body.theme-gray .menu-toggle {
+    background: rgba(28,32,40,.85);
+    color: #7a8aa0;
+    border-color: rgba(120,140,180,.2);
+    box-shadow: 2px 0 14px rgba(0,0,0,.35);
+  }
+  body.theme-gray .menu-toggle:hover {
+    background: rgba(40,46,56,.92);
+    color: #a8b4c4;
+  }
+
+  .menu-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(2,4,10,.6);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s;
+    z-index: 90;
+  }
+  .menu-backdrop.show { opacity: 1; pointer-events: auto; }
+
+  .menu-drawer {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 340px;
+    max-width: 88vw;
+    background: var(--c-drawer-bg);
+    border-right: 1.5px solid var(--c-drawer-border);
+    transform: translateX(-100%);
+    transition: transform .34s cubic-bezier(.3,1,.5,1), background .35s;
+    z-index: 96;
+    display: flex; flex-direction: column;
+    box-shadow: 6px 0 40px rgba(0,0,0,.5);
+  }
+  .menu-drawer.open { transform: translateX(0); }
+
+  .menu-inner {
+    display: flex; flex-direction: column;
+    height: 100%;
+    padding: 20px 18px 0;
+  }
+
+  .menu-top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .menu-brand {
+    font-size: 17px; font-weight: 800;
+    letter-spacing: 5px;
+    background: linear-gradient(90deg, #7fd8ff, #4f9dff);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  body.theme-gray .menu-brand {
+    background: linear-gradient(90deg, #8a9ab0, #5a6a88);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .menu-close {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid var(--c-card-border);
+    background: var(--c-card-bg);
+    color: var(--c-text-sub);
+    font-size: 15px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+    transition: all .18s;
+  }
+  .menu-close:hover { background: rgba(255,90,90,.16); color: #ff8888; border-color: rgba(255,90,90,.4); }
+
+  .theme-switch {
+    display: flex;
+    gap: 5px;
+    padding: 4px;
+    background: var(--c-card-bg);
+    border: 1px solid var(--c-card-border);
+    border-radius: 12px;
+    margin-bottom: 14px;
+  }
+  .theme-btn {
+    flex: 1;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    padding: 9px 4px;
+    border: none;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--c-text-sub);
+    cursor: pointer;
+    transition: all .2s;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 3px;
+    line-height: 1.2;
+  }
+  .theme-btn .tb-icon { font-size: 15px; line-height: 1; }
+  .theme-btn:hover { color: var(--c-text); }
+  .theme-btn.active {
+    background: rgba(95,168,255,.18);
+    color: var(--c-text-bright);
+    box-shadow: 0 0 16px rgba(95,168,255,.28);
+  }
+  body.theme-light .theme-btn.active {
+    background: rgba(37,99,235,.15);
+    box-shadow: 0 0 16px rgba(37,99,235,.2);
+  }
+  body.theme-gray .theme-btn.active {
+    background: rgba(100,130,180,.15);
+    box-shadow: 0 0 14px rgba(100,140,190,.2);
+  }
+
+  .menu-account {
+    padding: 12px 14px;
+    background: rgba(95,168,255,.055);
+    border: 1.5px solid rgba(95,168,255,.18);
+    border-radius: 14px;
+    margin-bottom: 14px;
+  }
+  body.theme-light .menu-account {
+    background: rgba(37,99,235,.06);
+    border-color: rgba(37,99,235,.2);
+  }
+  body.theme-gray .menu-account {
+    background: rgba(80,110,160,.05);
+    border-color: rgba(80,110,160,.15);
+  }
+  .account-guest {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 8px;
+  }
+  .account-login-btn {
+    width: 100%;
+    font-family: inherit;
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 3px;
+    color: #04060c;
+    padding: 11px 20px;
+    border: none; border-radius: 999px;
+    background: linear-gradient(180deg, #7fd8ff, #3ba0ff);
+    box-shadow: 0 0 22px rgba(80,180,255,.42), inset 0 1px 0 rgba(255,255,255,.7);
+    cursor: pointer;
+    transition: all .18s;
+  }
+  .account-login-btn:hover { box-shadow: 0 0 34px rgba(80,180,255,.7), inset 0 1px 0 rgba(255,255,255,.7); }
+  .account-login-btn:active { transform: scale(.96); }
+  body.theme-gray .account-login-btn {
+    background: linear-gradient(180deg, #8ab0d8, #5a80a8);
+    color: #0a1220;
+    box-shadow: 0 0 18px rgba(90,130,180,.35), inset 0 1px 0 rgba(255,255,255,.6);
+  }
+  .account-hint {
+    font-size: 10.5px; color: var(--c-text-dim);
+    letter-spacing: 1px;
+  }
+  .account-user {
+    display: flex; align-items: center;
+    gap: 11px;
+  }
+  .account-user.hide { display: none; }
+  .account-avatar {
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    background: rgba(95,168,255,.14);
+    border: 1px solid rgba(95,168,255,.3);
+    flex-shrink: 0;
+  }
+  .account-info {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; gap: 3px;
+    text-align: left;
+  }
+  .account-name {
+    font-size: 14px; font-weight: 700; color: var(--c-text-bright);
+    letter-spacing: .5px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .account-sub {
+    font-size: 11px; color: var(--c-text-sub); letter-spacing: 1px;
+    display: flex; gap: 6px; align-items: center;
+    flex-wrap: wrap;
+  }
+  .account-sub b { color: #ffd54a; font-size: 12px; font-weight: 800; }
+  body.theme-gray .account-sub b { color: #c0b070; }
+  .account-sub .best-hunt b { color: #ff9b5a; }
+  body.theme-gray .account-sub .best-hunt b { color: #b08060; }
+
+  .account-logout {
+    font-family: inherit;
+    font-size: 11px; letter-spacing: 1px;
+    color: var(--c-text-sub);
+    padding: 6px 11px;
+    border-radius: 999px;
+    background: var(--c-card-bg);
+    border: 1px solid var(--c-card-border);
+    cursor: pointer;
+    transition: all .18s;
+    flex-shrink: 0;
+  }
+  .account-logout:hover { color: #ff8888; border-color: rgba(255,90,90,.4); background: rgba(255,90,90,.1); }
+
+  .menu-wallet {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba(255,200,60,.08), rgba(255,200,60,.02));
+    border: 1.5px solid rgba(255,200,60,.22);
+    border-radius: 14px;
+    margin-bottom: 20px;
+  }
+  body.theme-gray .menu-wallet {
+    background: linear-gradient(135deg, rgba(180,160,90,.07), rgba(180,160,90,.02));
+    border-color: rgba(180,160,90,.2);
+  }
+  .menu-wallet-label {
+    font-size: 11px; letter-spacing: 3px; color: var(--c-text-sub);
+  }
+  .menu-wallet-value {
+    font-size: 24px; font-weight: 800;
+    color: #ffd54a;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    text-shadow: 0 0 20px rgba(255,200,60,.5);
+  }
+  body.theme-gray .menu-wallet-value { color: #c0b070; text-shadow: 0 0 12px rgba(180,160,90,.35); }
+
+  .menu-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 24px;
+    margin-right: -6px;
+    padding-right: 6px;
+  }
+  .menu-scroll::-webkit-scrollbar { width: 4px; }
+  .menu-scroll::-webkit-scrollbar-thumb {
+    background: rgba(95,168,255,.28);
+    border-radius: 2px;
+  }
+
+  .menu-section { margin-bottom: 22px; }
+  .menu-section-title {
+    font-size: 11px; letter-spacing: 4px;
+    color: var(--c-text-dim);
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .menu-section-title::after {
+    content: '';
+    flex: 1; height: 1px;
+    background: linear-gradient(90deg, rgba(95,168,255,.2), transparent);
+  }
+
+  .link-list { display: flex; flex-direction: column; gap: 7px; }
+  .link-item {
+    display: flex; align-items: center;
+    gap: 11px;
+    padding: 12px 14px;
+    background: var(--c-card-bg);
+    border: 1px solid var(--c-card-border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all .18s;
+    text-align: left;
+  }
+  .link-item:hover {
+    background: rgba(95,168,255,.11);
+    border-color: rgba(95,168,255,.4);
+    transform: translateX(3px);
+  }
+  body.theme-gray .link-item:hover {
+    background: rgba(100,140,190,.1);
+    border-color: rgba(100,140,190,.35);
+  }
+  .link-item:active { transform: translateX(3px) scale(.98); }
+  .link-icon {
+    width: 32px; height: 32px;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px;
+    background: rgba(95,168,255,.12);
+    border: 1px solid rgba(95,168,255,.22);
+    flex-shrink: 0;
+  }
+  .link-text {
+    flex: 1;
+    font-size: 13px; font-weight: 600;
+    color: var(--c-text);
+    letter-spacing: .5px;
+  }
+  .link-arrow {
+    font-size: 18px; color: var(--c-text-dim);
+    line-height: 1;
+  }
+  .link-item.skin-link .link-icon {
+    background: radial-gradient(circle at 40% 40%, rgba(220,140,255,.35), rgba(120,60,200,.15));
+    border-color: rgba(200,140,255,.4);
+  }
+  .link-item.skin-link .link-text::after {
+    content: ' 新';
+    font-size: 9px;
+    color: #ffd54a;
+    background: rgba(255,200,60,.15);
+    padding: 1px 6px;
+    border-radius: 999px;
+    margin-left: 6px;
+    letter-spacing: 1px;
+    vertical-align: middle;
+  }
+
+  .item-list { display: flex; flex-direction: column; gap: 8px; }
+  .item-card {
+    display: flex; align-items: center;
+    gap: 12px;
+    padding: 12px 13px;
+    background: var(--c-card-bg);
+    border: 1px solid var(--c-card-border);
+    border-radius: 13px;
+    transition: all .18s;
+    text-align: left;
+  }
+  .item-card:hover {
+    background: var(--c-card-hover);
+    border-color: rgba(95,168,255,.22);
+  }
+  .item-card.locked {
+    opacity: .42;
+    filter: grayscale(.6);
+    cursor: not-allowed;
+  }
+  .item-card.locked:hover {
+    background: var(--c-card-bg);
+    border-color: var(--c-card-border);
+    transform: none;
+  }
+  .item-card.usable { cursor: pointer; }
+  .item-card.usable:hover {
+    background: rgba(95,168,255,.11);
+    border-color: rgba(95,168,255,.42);
+    transform: translateX(3px);
+  }
+  .item-card.usable:active { transform: translateX(3px) scale(.98); }
+
+  .item-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 19px;
+    flex-shrink: 0;
+    background: var(--c-icon-bg);
+    border: 1px solid var(--c-card-border);
+  }
+
+  .item-info {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .item-name {
+    font-size: 13px; font-weight: 700; color: var(--c-text);
+    display: flex; align-items: center; gap: 6px;
+    flex-wrap: wrap;
+  }
+  .item-count {
+    font-size: 10px; font-weight: 700;
+    color: #5fa8ff;
+    background: rgba(95,168,255,.14);
+    padding: 1.5px 7px;
+    border-radius: 999px;
+    letter-spacing: .5px;
+  }
+  body.theme-gray .item-count {
+    color: #7a9ac0;
+    background: rgba(100,140,190,.13);
+  }
+  .item-desc {
+    font-size: 10.5px; line-height: 1.5;
+    color: var(--c-text-sub);
+  }
+  .item-price {
+    font-size: 11.5px; font-weight: 800;
+    color: #ffd54a;
+    letter-spacing: .3px;
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 10px rgba(255,200,60,.35);
+  }
+  body.theme-gray .item-price { color: #c0b070; text-shadow: none; }
+  .item-price span {
+    font-size: 9.5px; color: #a89050;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-left: 1px;
+  }
+  body.theme-gray .item-price span { color: #8a8060; }
+  .item-price::before {
+    content: '◆ ';
+    font-size: 9px;
+    color: #ffb800;
+    margin-right: 1px;
+  }
+  body.theme-gray .item-price::before { color: #a09060; }
+
+  .item-action {
+    flex-shrink: 0;
+    font-family: inherit;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: .5px;
+    color: #04060c;
+    padding: 8px 14px;
+    border: none; border-radius: 999px;
+    background: linear-gradient(180deg, #ffe27a, #ffb800);
+    cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap;
+    box-shadow: 0 0 16px rgba(255,190,0,.32);
+    min-width: 62px;
+  }
+  .item-action:hover:not(:disabled) {
+    box-shadow: 0 0 26px rgba(255,190,0,.55);
+    transform: translateY(-1px);
+  }
+  .item-action:active:not(:disabled) { transform: scale(.95); }
+  .item-action:disabled {
+    background: rgba(255,255,255,.06);
+    color: #4d6ea8;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  body.theme-light .item-action:disabled,
+  body.theme-gray .item-action:disabled {
+    background: rgba(0,0,0,.06);
+    color: #6a7a90;
+  }
+  body.theme-gray .item-action:not(:disabled) {
+    background: linear-gradient(180deg, #c8b878, #a09050);
+    color: #14171c;
+    box-shadow: 0 0 14px rgba(180,160,90,.3);
+  }
+  .item-action.blue {
+    background: linear-gradient(180deg, #7fd8ff, #3ba0ff);
+    box-shadow: 0 0 16px rgba(80,180,255,.35);
+  }
+  body.theme-gray .item-action.blue {
+    background: linear-gradient(180deg, #8ab0d8, #5a80a8);
+  }
+
+  .inv-empty {
+    font-size: 12px; color: var(--c-text-dim);
+    text-align: center;
+    padding: 20px 0;
+    letter-spacing: 1px;
+  }
+
+  .overlay {
+    position: fixed; inset: 0;
+    display: flex; overflow-y: auto;
+    padding: 26px 20px;
+    background: var(--c-overlay);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    z-index: 50;
+    transition: opacity .4s, background .35s;
+  }
+  .overlay.hide { opacity: 0; pointer-events: none; }
+  .panel {
+    margin: auto;
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center;
+    width: 100%; max-width: 380px;
+  }
+
+  h1 {
+    font-size: 52px; font-weight: 900; letter-spacing: 15px;
+    text-indent: 15px; line-height: 1.1;
+    background: linear-gradient(180deg, var(--c-title-top), var(--c-title-bottom));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: background .35s;
+  }
+  .en { font-size: 11px; letter-spacing: 9px; text-indent: 9px; color: var(--c-text-dim); margin: 6px 0 20px; }
+
+  .wallet {
+    display: flex; gap: 48px;
+    margin-bottom: 22px;
+  }
+  .wallet-item { display: flex; flex-direction: column; align-items: center; }
+  .wallet-label {
+    font-size: 10.5px; letter-spacing: 3px;
+    color: var(--c-text-dim); margin-bottom: 5px;
+  }
+  .wallet-value {
+    font-size: 25px; font-weight: 800;
+    color: #5fa8ff;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  body.theme-gray .wallet-value { color: #7a9ac0; }
+  .wallet-value.gold {
+    color: #ffd54a;
+    text-shadow: 0 0 16px rgba(255,200,60,.5);
+  }
+  body.theme-gray .wallet-value.gold { color: #c0b070; text-shadow: none; }
+
+  .story {
+    font-size: 13px; line-height: 1.9; color: var(--c-text-sub);
+    margin-bottom: 20px;
+  }
+  .story em { color: #5ef0d8; font-style: normal; font-weight: 700; }
+  .story strong { color: #ff5b5b; font-weight: 700; }
+  body.theme-gray .story em { color: #6ac0b0; }
+  body.theme-gray .story strong { color: #c07070; }
+
+  .section-title {
+    font-size: 11.5px; letter-spacing: 4px; color: var(--c-text-dim);
+    margin-bottom: 11px;
+  }
+
+  .mode-switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 9px;
+    width: 100%;
+    margin-bottom: 22px;
+  }
+  .mode-btn {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 5px;
+    padding: 15px 8px;
+    background: var(--c-icon-bg);
+    border: 1.5px solid var(--c-icon-border);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all .2s;
+    font-family: inherit;
+    color: var(--c-text-sub);
+  }
+  .mode-btn:hover { background: var(--c-card-hover); transform: translateY(-2px); }
+  .mode-btn:active { transform: translateY(0) scale(.98); }
+  .mode-btn.active {
+    background: rgba(95,168,255,.16);
+    border-color: #5fa8ff;
+    color: var(--c-text-bright);
+    box-shadow: 0 0 20px rgba(95,168,255,.4), inset 0 0 14px rgba(95,168,255,.1);
+  }
+  body.theme-gray .mode-btn.active {
+    background: rgba(100,140,190,.14);
+    border-color: #7a9ac0;
+    box-shadow: 0 0 16px rgba(100,140,190,.3);
+  }
+  .mode-btn .mb-icon { font-size: 22px; line-height: 1; }
+  .mode-btn .mb-name {
+    font-size: 13px; font-weight: 700; letter-spacing: 2px;
+  }
+  .mode-btn .mb-desc {
+    font-size: 9.5px; letter-spacing: .5px;
+    color: var(--c-text-dim);
+    text-align: center;
+    line-height: 1.4;
+  }
+  .mode-btn.active .mb-desc {
+    color: var(--c-text-sub);
+  }
+  .mode-btn .mb-best {
+    font-size: 10px;
+    font-weight: 700;
+    color: #ffd54a;
+    letter-spacing: .5px;
+    margin-top: 1px;
+  }
+  body.theme-gray .mode-btn .mb-best { color: #c0b070; }
+  .mode-btn[data-mode="hunt"] .mb-best { color: #ff9b5a; }
+  body.theme-gray .mode-btn[data-mode="hunt"] .mb-best { color: #b08060; }
+  .mode-btn .mb-best.empty {
+    color: var(--c-text-dim);
+    opacity: .55;
+    font-weight: 500;
+  }
+
+  .icon-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 9px;
+    width: 100%;
+    margin-bottom: 24px;
+  }
+  .icon-btn {
+    aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 23px; line-height: 1;
+    border-radius: 14px;
+    background: var(--c-icon-bg);
+    border: 1.5px solid var(--c-icon-border);
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    transition: all .18s cubic-bezier(.3,1.4,.5,1);
+    position: relative;
+  }
+  .icon-btn:hover { background: var(--c-card-hover); transform: translateY(-3px); }
+  .icon-btn.active {
+    background: rgba(95,168,255,.16);
+    border-color: #5fa8ff;
+    box-shadow: 0 0 20px rgba(95,168,255,.55), inset 0 0 14px rgba(95,168,255,.18);
+    transform: translateY(-3px) scale(1.04);
+  }
+  body.theme-gray .icon-btn.active {
+    background: rgba(100,140,190,.14);
+    border-color: #7a9ac0;
+    box-shadow: 0 0 16px rgba(100,140,190,.35), inset 0 0 12px rgba(100,140,190,.1);
+  }
+  .icon-btn.active::after {
+    content: '';
+    position: absolute; bottom: 5px; left: 50%;
+    width: 4px; height: 4px; border-radius: 50%;
+    background: #5fa8ff;
+    transform: translateX(-50%);
+    box-shadow: 0 0 8px #5fa8ff;
+  }
+  body.theme-gray .icon-btn.active::after {
+    background: #7a9ac0;
+    box-shadow: 0 0 6px #7a9ac0;
+  }
+
+  .hunter-skin-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 9px;
+    width: 100%;
+    margin-bottom: 24px;
+  }
+  .hunter-skin-btn {
+    aspect-ratio: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 4px;
+    border-radius: 14px;
+    background: var(--c-icon-bg);
+    border: 1.5px solid var(--c-icon-border);
+    color: inherit;
+    cursor: pointer;
+    padding: 5px 3px;
+    transition: all .18s cubic-bezier(.3,1.4,.5,1);
+    position: relative;
+    font-family: inherit;
+    overflow: hidden;
+  }
+  .hunter-skin-btn:hover { background: var(--c-card-hover); transform: translateY(-3px); }
+  .hunter-skin-btn.active {
+    background: rgba(95,168,255,.16);
+    border-color: #5fa8ff;
+    box-shadow: 0 0 20px rgba(95,168,255,.55), inset 0 0 14px rgba(95,168,255,.18);
+    transform: translateY(-3px) scale(1.04);
+  }
+  body.theme-gray .hunter-skin-btn.active {
+    background: rgba(100,140,190,.14);
+    border-color: #7a9ac0;
+    box-shadow: 0 0 16px rgba(100,140,190,.35), inset 0 0 12px rgba(100,140,190,.1);
+  }
+  .hunter-skin-btn.active::after {
+    content: '';
+    position: absolute; bottom: 4px; left: 50%;
+    width: 4px; height: 4px; border-radius: 50%;
+    background: #5fa8ff;
+    transform: translateX(-50%);
+    box-shadow: 0 0 8px #5fa8ff;
+  }
+  body.theme-gray .hunter-skin-btn.active::after {
+    background: #7a9ac0;
+    box-shadow: 0 0 6px #7a9ac0;
+  }
+  .hunter-skin-btn.locked {
+    opacity: .35;
+    cursor: not-allowed;
+  }
+  .hunter-skin-btn.locked:hover {
+    background: var(--c-icon-bg);
+    border-color: var(--c-icon-border);
+    transform: none;
+  }
+  .hunter-skin-btn .hs-tri {
+    width: 0; height: 0;
+    border-left: 13px solid transparent;
+    border-right: 13px solid transparent;
+    border-bottom: 22px solid #ff3b3b;
+    filter: drop-shadow(0 0 5px rgba(255,59,59,.7));
+    transition: all .25s;
+  }
+  .hunter-skin-btn[data-skin="ngc6611"] .hs-tri {
+    border-bottom-color: #ff7a3d;
+    filter: drop-shadow(0 0 7px rgba(255,122,61,.85));
+  }
+  .hunter-skin-btn[data-skin="ngc2237"] .hs-tri {
+    border-bottom-color: #ff5b8a;
+    filter: drop-shadow(0 0 7px rgba(255,91,138,.85));
+  }
+  .hunter-skin-btn[data-skin="m42"] .hs-tri {
+    border-bottom-color: #a76bff;
+    filter: drop-shadow(0 0 7px rgba(167,107,255,.85));
+  }
+  .hunter-skin-btn[data-skin="ngc7000"] .hs-tri {
+    border-bottom-color: #5eebc8;
+    filter: drop-shadow(0 0 7px rgba(94,235,200,.85));
+  }
+  .hunter-skin-btn .hs-name {
+    font-size: 8.5px;
+    color: var(--c-text-sub);
+    letter-spacing: .3px;
+    text-align: center;
+    line-height: 1.15;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .hunter-skin-btn.active .hs-name { color: var(--c-text-bright); }
+  .hunter-skin-btn .hs-lock {
+    position: absolute;
+    top: 3px; right: 3px;
+    font-size: 9px;
+    color: #ffd54a;
+    line-height: 1;
+  }
+  body.theme-gray .hunter-skin-btn .hs-lock { color: #c0b070; }
+
+  .diff-row { display: flex; gap: 9px; margin-bottom: 24px; }
+  .diff-btn {
+    font-family: inherit;
+    font-size: 13px; letter-spacing: 2px;
+    padding: 11px 22px;
+    border-radius: 999px;
+    background: var(--c-icon-bg);
+    border: 1.5px solid var(--c-icon-border);
+    color: var(--c-text-sub);
+    cursor: pointer;
+    transition: all .18s;
+  }
+  .diff-btn:hover { color: var(--c-text-bright); }
+  .diff-btn.active {
+    background: rgba(95,168,255,.16);
+    border-color: #5fa8ff;
+    color: var(--c-text-bright);
+    box-shadow: 0 0 20px rgba(95,168,255,.45);
+  }
+  body.theme-gray .diff-btn.active {
+    background: rgba(100,140,190,.14);
+    border-color: #7a9ac0;
+    box-shadow: 0 0 16px rgba(100,140,190,.3);
+  }
+
+  .primary {
+    font-family: inherit;
+    font-size: 15px; font-weight: 700; letter-spacing: 4px;
+    color: #04060c;
+    padding: 15px 50px;
+    border: none; border-radius: 999px;
+    background: linear-gradient(180deg, #7fd8ff, #3ba0ff);
+    box-shadow: 0 0 34px rgba(80,180,255,.5), inset 0 1px 0 rgba(255,255,255,.75);
+    cursor: pointer;
+    transition: transform .12s, box-shadow .25s;
+    width: 100%;
+    max-width: 260px;
+  }
+  .primary:hover { box-shadow: 0 0 54px rgba(80,180,255,.85), inset 0 1px 0 rgba(255,255,255,.75); }
+  .primary:active { transform: scale(.95); }
+  body.theme-gray .primary {
+    background: linear-gradient(180deg, #8ab0d8, #5a80a8);
+    color: #0a1220;
+    box-shadow: 0 0 24px rgba(90,130,180,.35), inset 0 1px 0 rgba(255,255,255,.6);
+  }
+
+  .ghost {
+    font-family: inherit;
+    font-size: 13.5px; font-weight: 600; letter-spacing: 3px;
+    color: var(--c-btn-ghost-text);
+    padding: 13px 40px;
+    border-radius: 999px;
+    background: var(--c-btn-ghost-bg);
+    border: 1.5px solid var(--c-btn-ghost-border);
+    cursor: pointer;
+    transition: all .18s;
+    width: 100%;
+    max-width: 260px;
+  }
+  .ghost:hover { background: var(--c-card-hover); color: var(--c-text-bright); }
+  .ghost:active { transform: scale(.96); }
+
+  .actions {
+    display: flex; flex-direction: column;
+    gap: 11px; align-items: center;
+    width: 100%;
+  }
+
+  .auth-tabs {
+    display: flex; gap: 8px;
+    margin-bottom: 22px;
+    padding: 4px;
+    background: var(--c-card-bg);
+    border: 1px solid var(--c-card-border);
+    border-radius: 999px;
+  }
+  .auth-tab {
+    font-family: inherit;
+    font-size: 13px; letter-spacing: 2px;
+    padding: 9px 26px;
+    border: none; border-radius: 999px;
+    background: transparent;
+    color: var(--c-text-sub);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .auth-tab.active {
+    background: rgba(95,168,255,.18);
+    color: var(--c-text-bright);
+    box-shadow: 0 0 18px rgba(95,168,255,.35);
+  }
+  body.theme-gray .auth-tab.active {
+    background: rgba(100,140,190,.16);
+    box-shadow: 0 0 14px rgba(100,140,190,.22);
+  }
+
+  .field {
+    width: 100%;
+    margin-bottom: 13px;
+    text-align: left;
+  }
+  .field-label {
+    font-size: 10.5px; letter-spacing: 3px;
+    color: var(--c-text-dim);
+    margin-bottom: 7px;
+    display: block;
+  }
+  .field input {
+    width: 100%;
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--c-text-bright);
+    padding: 13px 16px;
+    background: var(--c-input-bg);
+    border: 1.5px solid var(--c-input-border);
+    border-radius: 13px;
+    outline: none;
+    transition: all .2s;
+    letter-spacing: 1px;
+  }
+  .field input:focus {
+    border-color: #5fa8ff;
+    background: rgba(95,168,255,.08);
+    box-shadow: 0 0 22px rgba(95,168,255,.25);
+  }
+  body.theme-gray .field input:focus {
+    border-color: #7a9ac0;
+    background: rgba(100,140,190,.06);
+    box-shadow: 0 0 16px rgba(100,140,190,.15);
+  }
+  .field input::placeholder { color: var(--c-text-dim); opacity: .7; }
+
+  .auth-msg {
+    font-size: 12px;
+    letter-spacing: 1px;
+    min-height: 18px;
+    margin-bottom: 14px;
+    color: #ff6b6b;
+  }
+  .auth-msg.ok { color: #5ef0d8; }
+  body.theme-gray .auth-msg { color: #c07070; }
+  body.theme-gray .auth-msg.ok { color: #6ac0b0; }
+
+  /* 排行榜 */
+  .rank-tabs {
+    display: flex;
+    gap: 6px;
+    width: 100%;
+    margin-bottom: 16px;
+    padding: 4px;
+    background: var(--c-card-bg);
+    border: 1px solid var(--c-card-border);
+    border-radius: 999px;
+  }
+  .rank-tab {
+    flex: 1;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 10px 8px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--c-text-sub);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .rank-tab.active {
+    background: rgba(95,168,255,.18);
+    color: var(--c-text-bright);
+    box-shadow: 0 0 16px rgba(95,168,255,.3);
+  }
+  body.theme-gray .rank-tab.active {
+    background: rgba(100,140,190,.16);
+    box-shadow: 0 0 14px rgba(100,140,190,.22);
+  }
+  .rank-tab[data-rank-tab="hunt"].active {
+    background: rgba(255,155,90,.18);
+    box-shadow: 0 0 16px rgba(255,155,90,.3);
+  }
+
+  .rank-list {
+    width: 100%;
+    max-height: 52vh;
+    overflow-y: auto;
+    padding-right: 4px;
+    display: flex; flex-direction: column;
+    gap: 7px;
+    margin-bottom: 22px;
+  }
+  .rank-list::-webkit-scrollbar { width: 4px; }
+  .rank-list::-webkit-scrollbar-thumb {
+    background: rgba(95,168,255,.28); border-radius: 2px;
+  }
+  .rank-item {
+    display: flex; align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--c-card-bg);
+    border: 1px solid var(--c-card-border);
+    border-radius: 13px;
+    animation: itemIn .3s ease backwards;
+    text-align: left;
+  }
+  @keyframes itemIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .rank-item.me {
+    background: linear-gradient(135deg, rgba(95,168,255,.16), rgba(95,168,255,.05));
+    border-color: rgba(95,168,255,.45);
+    box-shadow: 0 0 22px rgba(95,168,255,.2);
+  }
+  body.theme-gray .rank-item.me {
+    background: linear-gradient(135deg, rgba(100,140,190,.14), rgba(100,140,190,.04));
+    border-color: rgba(100,140,190,.4);
+    box-shadow: 0 0 16px rgba(100,140,190,.15);
+  }
+  .rank-item.me.hunt-rank {
+    background: linear-gradient(135deg, rgba(255,155,90,.16), rgba(255,155,90,.05));
+    border-color: rgba(255,155,90,.45);
+  }
+  .rank-item .ri-num {
+    width: 26px;
+    font-size: 15px; font-weight: 800;
+    color: var(--c-text-dim);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+    text-align: center;
+  }
+  .rank-item:nth-child(1) .ri-num { color: #ffd54a; text-shadow: 0 0 14px rgba(255,200,60,.7); }
+  .rank-item:nth-child(2) .ri-num { color: #c7d4ff; }
+  .rank-item:nth-child(3) .ri-num { color: #ff9d6e; }
+  body.theme-gray .rank-item:nth-child(1) .ri-num { color: #c0b070; text-shadow: 0 0 10px rgba(180,160,90,.5); }
+  body.theme-gray .rank-item:nth-child(2) .ri-num { color: #a8b4c4; }
+  body.theme-gray .rank-item:nth-child(3) .ri-num { color: #c09080; }
+  .rank-item .ri-icon { font-size: 20px; line-height: 1; flex-shrink: 0; filter: saturate(.85) brightness(.9); }
+  .rank-item .ri-info {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .rank-item .ri-name {
+    font-size: 13.5px; font-weight: 700; color: var(--c-text);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .rank-item .ri-name .you {
+    font-size: 9.5px; font-weight: 700;
+    color: #5fa8ff;
+    background: rgba(95,168,255,.16);
+    padding: 1.5px 7px;
+    border-radius: 999px;
+    margin-left: 6px;
+    letter-spacing: 1px;
+  }
+  body.theme-gray .rank-item .ri-name .you {
+    color: #7a9ac0;
+    background: rgba(100,140,190,.14);
+  }
+  .rank-item.hunt-rank .ri-name .you {
+    color: #ff9b5a;
+    background: rgba(255,155,90,.16);
+  }
+  .rank-item .ri-name .guest-tag {
+    font-size: 9.5px; font-weight: 700;
+    color: var(--c-text-sub);
+    background: var(--c-card-bg);
+    padding: 1.5px 7px;
+    border-radius: 999px;
+    margin-left: 6px;
+    letter-spacing: 1px;
+  }
+  .rank-item .ri-diff {
+    font-size: 10px; letter-spacing: 1px;
+    color: var(--c-text-sub);
+  }
+  .rank-item .ri-time {
+    font-size: 18px; font-weight: 800;
+    color: var(--c-text-bright);
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 14px rgba(95,168,255,.45);
+    flex-shrink: 0;
+  }
+  .rank-item.hunt-rank .ri-time {
+    text-shadow: 0 0 14px rgba(255,155,90,.5);
+    color: #ffb07a;
+  }
+  body.theme-gray .rank-item.hunt-rank .ri-time {
+    color: #b08060;
+    text-shadow: none;
+  }
+  body.theme-gray .rank-item .ri-time {
+    text-shadow: 0 0 10px rgba(100,140,190,.3);
+  }
+  .rank-item .ri-time span { font-size: 11px; color: var(--c-text-sub); font-weight: 600; }
+
+  .notice {
+    width: 100%;
+    padding: 11px 14px;
+    background: var(--c-notice-bg);
+    border: 1px solid var(--c-notice-border);
+    border-radius: 12px;
+    font-size: 10.5px; line-height: 1.7;
+    color: var(--c-notice-text);
+    text-align: left;
+    margin-bottom: 14px;
+    letter-spacing: .3px;
+  }
+  .notice b { color: #ffd54a; }
+  body.theme-gray .notice b { color: #c0b070; }
+
+  .match-spinner {
+    width: 54px; height: 54px;
+    border-radius: 50%;
+    border: 3px solid rgba(95,168,255,.15);
+    border-top-color: #5fa8ff;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 22px;
+  }
+  body.theme-gray .match-spinner {
+    border-color: rgba(100,140,190,.15);
+    border-top-color: #7a9ac0;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .match-vs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    margin: 22px 0 18px;
+    width: 100%;
+  }
+  .match-side {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 8px;
+  }
+  .match-avatar {
+    width: 62px; height: 62px;
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+    background: rgba(95,168,255,.1);
+    border: 1.5px solid rgba(95,168,255,.3);
+    box-shadow: 0 0 22px rgba(95,168,255,.25);
+  }
+  .match-side:last-child .match-avatar {
+    background: rgba(255,90,90,.1);
+    border-color: rgba(255,90,90,.3);
+    box-shadow: 0 0 22px rgba(255,90,90,.25);
+  }
+  body.theme-gray .match-side:last-child .match-avatar {
+    background: rgba(180,90,90,.1);
+    border-color: rgba(180,90,90,.28);
+    box-shadow: 0 0 16px rgba(180,90,90,.18);
+  }
+  .match-name {
+    font-size: 13px; font-weight: 700;
+    color: var(--c-text);
+    letter-spacing: .5px;
+    max-width: 110px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .match-vs-text {
+    font-size: 18px; font-weight: 900;
+    color: #5fa8ff;
+    letter-spacing: 2px;
+    text-shadow: 0 0 22px rgba(95,168,255,.6);
+  }
+  body.theme-gray .match-vs-text {
+    color: #7a9ac0;
+    text-shadow: 0 0 16px rgba(100,140,190,.4);
+  }
+  .match-target {
+    font-size: 13px;
+    color: var(--c-text-sub);
+    letter-spacing: 1px;
+    margin-bottom: 24px;
+  }
+  .match-target b {
+    color: #ffd54a;
+    font-size: 22px;
+    font-weight: 900;
+    margin-left: 4px;
+    text-shadow: 0 0 16px rgba(255,200,60,.5);
+    font-variant-numeric: tabular-nums;
+  }
+  body.theme-gray .match-target b { color: #c0b070; text-shadow: none; }
+
+  .match-loading.hide, .match-result.hide { display: none; }
+
+  .history-list {
+    width: 100%;
+    max-height: 56vh;
+    overflow-y: auto;
+    margin-bottom: 22px;
+    display: flex; flex-direction: column;
+    gap: 8px;
+    padding-right: 4px;
+  }
+  .history-list::-webkit-scrollbar { width: 4px; }
+  .history-list::-webkit-scrollbar-thumb {
+    background: rgba(95,168,255,.3); border-radius: 2px;
+  }
+  .history-item {
+    display: flex; align-items: center;
+    gap: 11px;
+    padding: 11px 14px;
+    background: var(--c-card-bg);
+    border: 1px solid var(--c-card-border);
+    border-radius: 12px;
+    font-size: 13px;
+    animation: itemIn .3s ease backwards;
+  }
+  .history-item .hi-icon { font-size: 19px; line-height: 1; filter: saturate(.85) brightness(.9); }
+  .history-item .hi-info {
+    display: flex; flex-direction: column; gap: 3px;
+    align-items: flex-start;
+  }
+  .history-item .hi-diff {
+    font-size: 10.5px; letter-spacing: 1px;
+    color: var(--c-text-sub);
+    padding: 1px 8px;
+    background: var(--c-card-bg);
+    border-radius: 999px;
+  }
+  .history-item .hi-diff.hunt {
+    color: #ff9b5a;
+    background: rgba(255,155,90,.14);
+  }
+  .history-item .hi-token {
+    font-size: 10.5px; color: #ffd54a; letter-spacing: .5px;
+  }
+  body.theme-gray .history-item .hi-token { color: #c0b070; }
+  .history-item .hi-time {
+    margin-left: auto;
+    font-size: 19px; font-weight: 800;
+    color: var(--c-text-bright);
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 14px rgba(95,168,255,.5);
+  }
+  .history-item.hunt-hist .hi-time {
+    color: #ffb07a;
+    text-shadow: 0 0 14px rgba(255,155,90,.5);
+  }
+  body.theme-gray .history-item.hunt-hist .hi-time {
+    color: #b08060;
+    text-shadow: none;
+  }
+  body.theme-gray .history-item .hi-time { text-shadow: none; }
+  .history-item .hi-time span { font-size: 12px; color: var(--c-text-sub); font-weight: 600; }
+  .history-empty {
+    text-align: center;
+    color: var(--c-text-dim);
+    font-size: 13px;
+    letter-spacing: 1px;
+    padding: 50px 0;
+    width: 100%;
+  }
+
+  .pause-icon {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 23px; letter-spacing: 3px;
+    color: #5fa8ff;
+    background: rgba(95,168,255,.1);
+    border: 1.5px solid rgba(95,168,255,.35);
+    box-shadow: 0 0 30px rgba(95,168,255,.3);
+    margin-bottom: 18px;
+  }
+  body.theme-gray .pause-icon {
+    color: #7a9ac0;
+    background: rgba(100,140,190,.08);
+    border-color: rgba(100,140,190,.28);
+    box-shadow: 0 0 20px rgba(100,140,190,.15);
+  }
+
+  .death { font-size: 13px; color: #ff7b7b; letter-spacing: 2px; margin-bottom: 14px; }
+  body.theme-gray .death { color: #c07070; }
+  .big {
+    font-size: 70px; font-weight: 900; line-height: 1;
+    color: var(--c-text-bright); font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 38px rgba(90,160,255,.85);
+  }
+  body.theme-gray .big {
+    text-shadow: 0 0 24px rgba(100,140,190,.4);
+  }
+  .big span { font-size: 20px; color: var(--c-text-sub); margin-left: 4px; }
+  .record {
+    font-size: 12.5px; color: var(--c-text-sub); letter-spacing: 1px;
+    margin: 18px 0 8px; line-height: 1.95;
+  }
+  .record b { color: #ffd54a; font-weight: 700; }
+  body.theme-gray .record b { color: #c0b070; }
+  .record .tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 11px; border-radius: 999px;
+    background: var(--c-card-bg);
+    margin: 0 3px;
+  }
+  .record .tag.hunt { color: #ff9b5a; }
+  .record .best-value.hunt-best { color: #ff9b5a; }
+  body.theme-gray .record .best-value.hunt-best { color: #b08060; }
+  .earned {
+    font-size: 14px; font-weight: 700; letter-spacing: 1px;
+    color: #ffd54a;
+    margin-bottom: 14px;
+    text-shadow: 0 0 18px rgba(255,200,60,.5);
+  }
+  body.theme-gray .earned { color: #c0b070; text-shadow: none; }
+  .earned span { font-size: 11px; color: var(--c-text-sub); font-weight: 500; letter-spacing: 2px; }
+  .earned .formula {
+    display: block;
+    font-size: 10.5px; color: var(--c-text-sub); font-weight: 500;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+
+  .hunt-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+    margin: 14px 0 20px;
+  }
+  .hunt-stat-cell {
+    padding: 12px;
+    background: var(--c-card-bg);
+    border: 1px solid var(--c-card-border);
+    border-radius: 13px;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 4px;
+  }
+  .hunt-stat-cell .hsc-label {
+    font-size: 10px; letter-spacing: 3px;
+    color: var(--c-text-dim);
+  }
+  .hunt-stat-cell .hsc-value {
+    font-size: 24px; font-weight: 800;
+    color: var(--c-text-bright);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .hunt-stat-cell .hsc-value.cyan { color: #5ef0d8; text-shadow: 0 0 16px rgba(94,240,216,.5); }
+  .hunt-stat-cell .hsc-value.gold { color: #ffd54a; text-shadow: 0 0 16px rgba(255,200,60,.5); }
+  .hunt-stat-cell .hsc-value.pink { color: #ff9b5a; text-shadow: 0 0 16px rgba(255,155,90,.5); }
+  body.theme-gray .hunt-stat-cell .hsc-value.cyan { color: #6ac0b0; text-shadow: none; }
+  body.theme-gray .hunt-stat-cell .hsc-value.gold { color: #c0b070; text-shadow: none; }
+  body.theme-gray .hunt-stat-cell .hsc-value.pink { color: #b08060; text-shadow: none; }
+
+  .match-result-banner {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    display: none;
+    flex-direction: column;
+    align-items: center; gap: 5px;
+    letter-spacing: 2px;
+  }
+  .match-result-banner.show { display: flex; }
+  .match-result-banner.win {
+    background: linear-gradient(135deg, rgba(94,240,216,.14), rgba(94,240,216,.03));
+    border: 1.5px solid rgba(94,240,216,.4);
+  }
+  .match-result-banner.lose {
+    background: linear-gradient(135deg, rgba(255,90,90,.14), rgba(255,90,90,.03));
+    border: 1.5px solid rgba(255,90,90,.4);
+  }
+  .match-result-banner.win .mrb-title { color: #5ef0d8; text-shadow: 0 0 22px rgba(94,240,216,.6); }
+  .match-result-banner.lose .mrb-title { color: #ff6b6b; text-shadow: 0 0 22px rgba(255,90,90,.5); }
+  .match-result-banner .mrb-title {
+    font-size: 20px; font-weight: 900;
+    letter-spacing: 6px;
+  }
+  .match-result-banner .mrb-sub {
+    font-size: 11.5px;
+    color: var(--c-text-sub);
+    letter-spacing: 1px;
+  }
+  .match-result-banner .mrb-sub b { color: var(--c-text-bright); font-weight: 700; }
+
+  .shop-page-head {
+    width: 100%;
+    display: flex; align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .back-btn {
+    width: 38px; height: 38px;
+    border-radius: 12px;
+    border: 1.5px solid var(--c-card-border);
+    background: var(--c-card-bg);
+    color: var(--c-btn-ghost-text);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0;
+    transition: all .18s;
+    flex-shrink: 0;
+    font-family: inherit;
+  }
+  .back-btn:hover { background: var(--c-card-hover); color: var(--c-text-bright); }
+  .back-btn:active { transform: scale(.92); }
+  .shop-page-title {
+    flex: 1;
+    font-size: 16px; font-weight: 800; letter-spacing: 4px;
+    color: var(--c-text-bright);
+    text-align: left;
+  }
+  .shop-page-points {
+    display: flex; flex-direction: column; align-items: flex-end;
+    gap: 1px;
+  }
+  .shop-page-points .pp-label {
+    font-size: 9px; letter-spacing: 3px; color: var(--c-text-dim);
+  }
+  .shop-page-points .pp-value {
+    font-size: 20px; font-weight: 800; color: #ffd54a;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    text-shadow: 0 0 16px rgba(255,200,60,.5);
+  }
+  body.theme-gray .shop-page-points .pp-value { color: #c0b070; text-shadow: none; }
+
+  .skin-list-full {
+    width: 100%;
+    max-height: 62vh;
+    overflow-y: auto;
+    padding-right: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .skin-list-full::-webkit-scrollbar { width: 4px; }
+  .skin-list-full::-webkit-scrollbar-thumb {
+    background: rgba(95,168,255,.28); border-radius: 2px;
+  }
+
+  .skin-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    background: var(--c-card-bg);
+    border: 1.5px solid var(--c-card-border);
+    border-radius: 15px;
+    transition: all .2s;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+  }
+  .skin-item:hover {
+    background: var(--c-card-hover);
+    border-color: rgba(95,168,255,.25);
+  }
+  .skin-item.equipped {
+    border-color: rgba(160,110,255,.55);
+    background: linear-gradient(135deg, rgba(160,110,255,.12), rgba(120,70,200,.04));
+    box-shadow: 0 0 22px rgba(160,110,255,.2);
+  }
+  body.theme-gray .skin-item.equipped {
+    border-color: rgba(140,110,190,.42);
+    background: linear-gradient(135deg, rgba(140,110,190,.1), rgba(100,70,150,.035));
+    box-shadow: 0 0 16px rgba(140,110,190,.15);
+  }
+  .skin-item.locked { opacity: .5; }
+  .skin-item.locked:hover {
+    background: var(--c-card-bg);
+    border-color: var(--c-card-border);
+  }
+
+  .skin-preview {
+    width: 62px; height: 62px;
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    background: var(--c-icon-bg);
+    border: 1.5px solid var(--c-card-border);
+  }
+  .tri {
+    width: 0; height: 0;
+    border-left: 13px solid transparent;
+    border-right: 13px solid transparent;
+    border-bottom: 22px solid #ff3b3b;
+    filter: drop-shadow(0 0 6px rgba(255,59,59,.7));
+    transition: all .25s;
+  }
+  .skin-preview[data-skin="ngc6611"] .tri {
+    border-bottom-color: #ff7a3d;
+    filter: drop-shadow(0 0 8px rgba(255,122,61,.85));
+  }
+  .skin-preview[data-skin="ngc2237"] .tri {
+    border-bottom-color: #ff5b8a;
+    filter: drop-shadow(0 0 8px rgba(255,91,138,.85));
+  }
+  .skin-preview[data-skin="m42"] .tri {
+    border-bottom-color: #a76bff;
+    filter: drop-shadow(0 0 8px rgba(167,107,255,.85));
+  }
+  .skin-preview[data-skin="ngc7000"] .tri {
+    border-bottom-color: #5eebc8;
+    filter: drop-shadow(0 0 8px rgba(94,235,200,.85));
+  }
+
+  .skin-body {
+    flex: 1; min-width: 0;
+    display: flex; flex-direction: column; gap: 5px;
+  }
+  .skin-name {
+    font-size: 14.5px; font-weight: 700; color: var(--c-text-bright);
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap;
+  }
+  .skin-code {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: var(--c-text-sub);
+    background: var(--c-card-bg);
+    border: 1px solid var(--c-card-border);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+  }
+  .skin-desc {
+    font-size: 11px; line-height: 1.55;
+    color: var(--c-text-sub);
+  }
+  .skin-meta {
+    display: flex;
+    align-items: center; gap: 8px;
+    margin-top: 2px;
+  }
+  .skin-price {
+    font-size: 12px; font-weight: 800;
+    color: #ffd54a;
+    letter-spacing: .3px;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 10px rgba(255,200,60,.35);
+  }
+  body.theme-gray .skin-price { color: #c0b070; text-shadow: none; }
+  .skin-price span { font-size: 10px; color: #a89050; margin-left: 1px; letter-spacing: 1px; }
+  body.theme-gray .skin-price span { color: #8a8060; }
+  .skin-price::before {
+    content: '◆ ';
+    font-size: 9.5px;
+    color: #ffb800;
+    margin-right: 1px;
+  }
+  body.theme-gray .skin-price::before { color: #a09060; }
+  .skin-price.free { color: #5ef0d8; }
+  .skin-price.free::before { color: #5ef0d8; }
+  .skin-price.free span { color: #5ef0d8; opacity: .7; }
+
+  .skin-owned {
+    font-size: 10px;
+    font-weight: 700;
+    color: #5fa8ff;
+    background: rgba(95,168,255,.14);
+    padding: 2px 8px;
+    border-radius: 999px;
+    letter-spacing: .5px;
+  }
+  .skin-owned.equipped {
+    color: #b070ff;
+    background: rgba(160,110,255,.18);
+  }
+  body.theme-gray .skin-owned {
+    color: #7a9ac0;
+    background: rgba(100,140,190,.13);
+  }
+  body.theme-gray .skin-owned.equipped {
+    color: #9a80c0;
+    background: rgba(140,110,190,.16);
+  }
+
+  .skin-action {
+    flex-shrink: 0;
+    font-family: inherit;
+    font-size: 12.5px; font-weight: 700;
+    letter-spacing: .5px;
+    color: #14080c;
+    padding: 10px 16px;
+    border: none; border-radius: 999px;
+    background: linear-gradient(180deg, #d8a8ff, #a76bff);
+    cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap;
+    box-shadow: 0 0 16px rgba(180,110,255,.4);
+    min-width: 72px;
+  }
+  .skin-action:hover:not(:disabled) {
+    box-shadow: 0 0 26px rgba(180,110,255,.7);
+    transform: translateY(-1px);
+  }
+  .skin-action:active:not(:disabled) { transform: scale(.95); }
+  .skin-action:disabled {
+    background: rgba(255,255,255,.06);
+    color: #6a7a90;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  body.theme-gray .skin-action:not(:disabled) {
+    background: linear-gradient(180deg, #b898e0, #8a6ab0);
+    color: #14171c;
+    box-shadow: 0 0 14px rgba(140,110,190,.35);
+  }
+  .skin-action.equipped {
+    background: rgba(160,110,255,.18);
+    color: #c890ff;
+    border: 1.5px solid rgba(160,110,255,.42);
+    box-shadow: none;
+    cursor: default;
+  }
+  body.theme-gray .skin-action.equipped {
+    background: rgba(140,110,190,.16);
+    color: #a890d0;
+    border-color: rgba(140,110,190,.35);
+  }
+  .skin-action.blue {
+    background: linear-gradient(180deg, #7fd8ff, #3ba0ff);
+    color: #04060c;
+    box-shadow: 0 0 16px rgba(80,180,255,.35);
+  }
+  .skin-action.blue:hover:not(:disabled) {
+    box-shadow: 0 0 26px rgba(80,180,255,.65);
+  }
+  body.theme-gray .skin-action.blue {
+    background: linear-gradient(180deg, #8ab0d8, #5a80a8);
+    color: #0a1220;
+  }
+
+  @media (max-width: 480px) {
+    .quick-btn {
+      width: 48px; height: 48px;
+      font-size: 22px;
+      border-radius: 13px;
+    }
+    .quick-btn .qb-n {
+      min-width: 18px; height: 18px;
+      font-size: 10px;
+    }
+    .quick-bar {
+      left: 14px;
+      bottom: 18px;
+      padding: 6px;
+      gap: 8px;
+    }
+    .skin-preview {
+      width: 54px; height: 54px;
+    }
+    .tri {
+      border-left-width: 11px;
+      border-right-width: 11px;
+      border-bottom-width: 19px;
+    }
+    .hunter-skin-btn .hs-tri {
+      border-left-width: 10px;
+      border-right-width: 10px;
+      border-bottom-width: 17px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<div class="hud" id="surviveHud">
+  <div class="time" id="timeEl">0.0<span>s</span></div>
+  <div class="hud-right">
+    <div class="sub"><b id="echoEl">0</b> 回声 · <i id="enemyEl">0</i> 追猎</div>
+    <div class="sub token-line" id="tokenHud">替身 × <b>0</b></div>
+    <div class="match-target-hud" id="matchTargetHud">目标 <b id="matchTargetHudVal">0.0s</b></div>
+  </div>
+</div>
+
+<div class="hud hunt-hud" id="huntHud">
+  <div class="time" id="huntTimeEl">30.0<span>s</span></div>
+  <div class="hud-right">
+    <div class="sub">追 捕 <b id="huntCatchEl">0</b> · 连 击 <b id="huntComboEl">×1</b></div>
+    <div class="sub hunt-score-line">分 数 <b id="huntScoreEl">0</b></div>
+  </div>
+</div>
+
+<button class="pause-btn" id="pauseBtn" title="暂停 / 继续 (Esc)">❚❚</button>
+
+<div class="quick-bar" id="quickBar"></div>
+
+<button class="menu-toggle" id="menuToggle" title="打开菜单 (M)">☰</button>
+<div class="menu-backdrop" id="menuBackdrop"></div>
+<div class="menu-drawer" id="menuDrawer">
+  <div class="menu-inner">
+    <div class="menu-top">
+      <div class="menu-brand">回 声 菜 单</div>
+      <button class="menu-close" id="menuClose">✕</button>
+    </div>
+
+    <div class="theme-switch" id="themeSwitch">
+      <button class="theme-btn active" data-theme="dark" title="黑夜模式">
+        <span class="tb-icon">🌙</span>
+        <span>黑夜</span>
+      </button>
+      <button class="theme-btn" data-theme="light" title="白天模式">
+        <span class="tb-icon">☀️</span>
+        <span>白天</span>
+      </button>
+      <button class="theme-btn" data-theme="gray" title="柔光模式：保留颜色，降低亮度">
+        <span class="tb-icon">🌫️</span>
+        <span>柔光</span>
+      </button>
+    </div>
+
+    <div class="menu-account">
+      <div class="account-guest" id="accountGuest">
+        <button class="account-login-btn" id="openLoginBtn">登 录 / 注 册</button>
+        <div class="account-hint">登录后数据独立保存</div>
+      </div>
+      <div class="account-user hide" id="accountUser">
+        <div class="account-avatar" id="accountAvatar">⭐</div>
+        <div class="account-info">
+          <div class="account-name" id="accountName">玩家</div>
+          <div class="account-sub">
+            <span>生存 <b id="accountBestSurvive">0.0s</b></span>
+            <span class="best-hunt">追猎 <b id="accountBestHunt">0分</b></span>
+          </div>
+        </div>
+        <button class="account-logout" id="logoutBtn">退出</button>
+      </div>
+    </div>
+
+    <div class="menu-wallet">
+      <span class="menu-wallet-label">积 分</span>
+      <span class="menu-wallet-value" id="menuPoints">0</span>
+    </div>
+
+    <div class="menu-scroll">
+      <div class="menu-section">
+        <div class="menu-section-title">联 机</div>
+        <div class="link-list">
+          <div class="link-item" id="leaderboardBtn">
+            <span class="link-icon">🏆</span>
+            <span class="link-text">全球排行榜</span>
+            <span class="link-arrow">›</span>
+          </div>
+          <div class="link-item" id="matchBtn">
+            <span class="link-icon">⚔️</span>
+            <span class="link-text">联机对战</span>
+            <span class="link-arrow">›</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-section">
+        <div class="menu-section-title">追 捕 者 皮 肤 商 店</div>
+        <div class="link-list">
+          <div class="link-item skin-link" id="openSkinShopBtn">
+            <span class="link-icon">🎨</span>
+            <span class="link-text">星云皮肤商店</span>
+            <span class="link-arrow">›</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-section">
+        <div class="menu-section-title">道 具 商 店</div>
+        <div class="item-list" id="shopList"></div>
+      </div>
+      <div class="menu-section">
+        <div class="menu-section-title">我 的 库 存</div>
+        <div class="item-list" id="invList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 开始界面 -->
+<div class="overlay" id="startScreen">
+  <div class="panel">
+    <h1>回声</h1>
+    <div class="en">E C H O</div>
+
+    <div class="wallet">
+      <div class="wallet-item">
+        <span class="wallet-label">积分</span>
+        <span class="wallet-value" id="pointsEl">0</span>
+      </div>
+      <div class="wallet-item">
+        <span class="wallet-label">替身</span>
+        <span class="wallet-value gold" id="tokensEl">0</span>
+      </div>
+    </div>
+
+    <div class="story" id="storySurvive">
+      你追杀你。<br>
+      每 6 秒，你过去的走位会被封存，<br>
+      变成一个<em>永远循环重放</em>的回声。<br><br>
+      你动得越多，回声越致命。<br>
+      但你不动，<strong>红点就会围上来</strong>。
+    </div>
+
+    <div class="story" id="storyHunt" style="display:none;">
+      现在换你了。<br>
+      你是一个<em>追捕者</em>，<br>
+      目标是屏幕上那个不断逃跑的光点。<br><br>
+      它会留下<em>幻影</em>——过去的自己，<br>
+      碰到幻影会<strong>损失时间</strong>。<br>
+      在时间归零前抓住它。
+    </div>
+
+    <div class="section-title">游 戏 模 式</div>
+    <div class="mode-switch" id="modeSwitch">
+      <button class="mode-btn active" data-mode="survive">
+        <span class="mb-icon">🌀</span>
+        <span class="mb-name">生 存</span>
+        <span class="mb-best" id="modeBestSurvive">— </span>
+      </button>
+      <button class="mode-btn" data-mode="hunt">
+        <span class="mb-icon">⚔️</span>
+        <span class="mb-name">追 猎</span>
+        <span class="mb-best" id="modeBestHunt">— </span>
+      </button>
+    </div>
+
+    <div id="playerSkinSection">
+      <div class="section-title">选 择 形 态</div>
+      <div class="icon-grid" id="iconGrid"></div>
+    </div>
+
+    <div id="hunterSkinSection" style="display:none;">
+      <div class="section-title">选 择 追 捕 者 皮 肤</div>
+      <div class="hunter-skin-grid" id="hunterSkinGrid"></div>
+      <div style="font-size:10.5px; color:var(--c-text-dim); letter-spacing:1px; margin-top:-14px; margin-bottom:22px;">
+        在左侧菜单的 <span style="color:#b070ff;">星云皮肤商店</span> 解锁更多皮肤
+      </div>
+    </div>
+
+    <div class="section-title">难 度</div>
+    <div class="diff-row" id="diffRow">
+      <button class="diff-btn" data-diff="chill">悠闲</button>
+      <button class="diff-btn active" data-diff="normal">标准</button>
+      <button class="diff-btn" data-diff="nightmare">噩梦</button>
+    </div>
+
+    <div class="actions">
+      <button class="primary" id="startBtn">开 始</button>
+      <button class="ghost" id="historyBtn">历 史 成 绩</button>
+    </div>
+  </div>
+</div>
+
+<!-- 皮肤商店 -->
+<div class="overlay hide" id="skinShopScreen">
+  <div class="panel">
+    <div class="shop-page-head">
+      <button class="back-btn" id="closeSkinShopBtn">←</button>
+      <div class="shop-page-title">星 云 皮 肤</div>
+      <div class="shop-page-points">
+        <span class="pp-label">积 分</span>
+        <span class="pp-value" id="skinShopPoints">0</span>
+      </div>
+    </div>
+
+    <div class="notice" style="margin-bottom:14px;">
+      <b>提示：</b>追捕者皮肤会改变三角的颜色与光效。购买后自动装备。在追猎模式下它是你自己，在生存模式下它是敌人。
+    </div>
+
+    <div class="skin-list-full" id="skinListFull"></div>
+
+    <button class="primary" id="skinShopBackBtn">返 回</button>
+  </div>
+</div>
+
+<!-- 登录 -->
+<div class="overlay hide" id="loginScreen">
+  <div class="panel">
+    <h1 style="font-size:38px;letter-spacing:13px;text-indent:13px;">账 户</h1>
+    <div class="en">A C C O U N T</div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-auth="login">登 录</button>
+      <button class="auth-tab" data-auth="register">注 册</button>
+    </div>
+
+    <div class="field">
+      <span class="field-label">账 号</span>
+      <input type="text" id="authUser" placeholder="2 - 12 个字符" maxlength="12" autocomplete="off">
+    </div>
+    <div class="field">
+      <span class="field-label">密 码</span>
+      <input type="password" id="authPwd" placeholder="至少 4 个字符" maxlength="24" autocomplete="off">
+    </div>
+
+    <div class="auth-msg" id="authMsg"></div>
+
+    <div class="actions">
+      <button class="primary" id="authSubmit">登 录</button>
+      <button class="ghost" id="closeLoginBtn">返 回</button>
+    </div>
+  </div>
+</div>
+
+<!-- 排行榜 -->
+<div class="overlay hide" id="rankScreen">
+  <div class="panel">
+    <h1 style="font-size:36px;letter-spacing:12px;text-indent:12px;">排行榜</h1>
+    <div class="en">L E A D E R B O A R D</div>
+
+    <div class="rank-tabs" id="rankTabs">
+      <button class="rank-tab active" data-rank-tab="survive">生 存 榜</button>
+      <button class="rank-tab" data-rank-tab="hunt">追 猎 榜</button>
+    </div>
+
+    <div class="notice" id="rankNotice">
+      <b>说明：</b>榜单汇总本机所有账户成绩，并混合模拟对手。生存榜按秒数排名，追猎榜按分数排名。
+    </div>
+
+    <div class="rank-list" id="rankList"></div>
+
+    <button class="primary" id="closeRankBtn">返 回</button>
+  </div>
+</div>
+
+<!-- 匹配 -->
+<div class="overlay hide" id="matchScreen">
+  <div class="panel">
+    <div class="match-loading" id="matchLoading">
+      <div class="match-spinner"></div>
+      <h1 style="font-size:32px;letter-spacing:10px;text-indent:10px;">匹配中</h1>
+      <div class="en">M A T C H I N G</div>
+      <p style="color:var(--c-text-sub);font-size:13px;letter-spacing:1px;">正在寻找实力相近的对手…</p>
+    </div>
+
+    <div class="match-result hide" id="matchResult">
+      <h1 style="font-size:32px;letter-spacing:10px;text-indent:10px;">匹配成功</h1>
+      <div class="en">M A T C H E D</div>
+
+      <div class="match-vs">
+        <div class="match-side">
+          <div class="match-avatar" id="matchMyAvatar">⭐</div>
+          <div class="match-name" id="matchMyName">你</div>
+        </div>
+        <div class="match-vs-text">VS</div>
+        <div class="match-side">
+          <div class="match-avatar" id="matchOpAvatar">👾</div>
+          <div class="match-name" id="matchOpName">对手</div>
+        </div>
+      </div>
+
+      <div class="match-target">目标存活 <b id="matchTargetVal">30.0s</b></div>
+
+      <div class="actions">
+        <button class="primary" id="matchStartBtn">开 始 对 战</button>
+        <button class="ghost" id="matchCancelBtn">取 消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 历史 -->
+<div class="overlay hide" id="historyScreen">
+  <div class="panel">
+    <h1 style="font-size:36px;letter-spacing:12px;text-indent:12px;">历史成绩</h1>
+    <div class="en">H I S T O R Y</div>
+
+    <div class="rank-tabs" id="histTabs">
+      <button class="rank-tab active" data-hist-tab="survive">生 存</button>
+      <button class="rank-tab" data-hist-tab="hunt">追 猎</button>
+      <button class="rank-tab" data-hist-tab="all">全 部</button>
+    </div>
+
+    <div class="history-list" id="historyList"></div>
+    <button class="primary" id="closeHistoryBtn">返 回 主 页</button>
+  </div>
+</div>
+
+<!-- 暂停 -->
+<div class="overlay hide" id="pauseScreen">
+  <div class="panel">
+    <div class="pause-icon">❚❚</div>
+    <h1 style="font-size:40px;letter-spacing:14px;text-indent:14px;">暂停</h1>
+    <div class="en">P A U S E</div>
+
+    <div class="actions">
+      <button class="primary" id="resumeBtn">继 续 游 戏</button>
+      <button class="ghost" id="restartPauseBtn">重 新 开 始</button>
+      <button class="ghost" id="homeBtn">返 回 主 页</button>
+    </div>
+  </div>
+</div>
+
+<!-- 结算 -->
+<div class="overlay hide" id="endScreen">
+  <div class="panel">
+    <div class="death" id="deathEl"></div>
+
+    <div id="surviveEnd">
+      <div class="big" id="finalTime">0.0<span>s</span></div>
+    </div>
+
+    <div id="huntEnd" style="display:none; width:100%;">
+      <div class="big" id="huntFinalScore">0</div>
+      <div class="hunt-stats-grid">
+        <div class="hunt-stat-cell">
+          <span class="hsc-label">捕 获</span>
+          <span class="hsc-value cyan" id="huntFinalCatches">0</span>
+        </div>
+        <div class="hunt-stat-cell">
+          <span class="hsc-label">最 高 连 击</span>
+          <span class="hsc-value pink" id="huntFinalCombo">×1</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="match-result-banner" id="matchResultBanner">
+      <div class="mrb-title" id="mrbTitle">胜 利</div>
+      <div class="mrb-sub" id="mrbSub"></div>
+    </div>
+
+    <div class="record">
+      <div id="finalTag"></div>
+      <span id="bestLabel">最高生存 </span><b id="bestEl" class="best-value">0.0s</b>
+    </div>
+    <div class="earned" id="earnedEl">+0 <span>积分</span></div>
+    <div class="actions">
+      <button class="primary" id="againBtn">再 来 一 次</button>
+      <button class="ghost" id="homeBtn2">返 回 主 页</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ===================== 主题系统 ===================== */
+  const THEMES = {
+    dark: { canvasBg: '#04060c', gridColor: 'rgba(70,120,220,0.07)', warnBorderRGB: '94,240,216', flashRGB: '255,40,40' },
+    light: { canvasBg: '#eef2f9', gridColor: 'rgba(60,100,180,0.11)', warnBorderRGB: '20,120,110', flashRGB: '220,50,50' },
+    gray: { canvasBg: '#22262e', gridColor: 'rgba(120,140,180,0.055)', warnBorderRGB: '110,130,160', flashRGB: '160,90,90' }
+  };
+  const THEME_KEY = 'echo_theme_v1';
+  let currentThemeKey = 'dark';
+  function getTheme() { return THEMES[currentThemeKey] || THEMES.dark; }
+  function setTheme(key) {
+    if (!THEMES[key]) key = 'dark';
+    currentThemeKey = key;
+    document.body.classList.remove('theme-dark', 'theme-light', 'theme-gray');
+    document.body.classList.add('theme-' + key);
+    try { localStorage.setItem(THEME_KEY, key); } catch (e) {}
+    document.querySelectorAll('.theme-btn').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.theme === key);
+    });
+  }
+  function loadTheme() {
+    let saved = 'dark';
+    try { saved = localStorage.getItem(THEME_KEY) || 'dark'; } catch (e) {}
+    if (!THEMES[saved]) saved = 'dark';
+    setTheme(saved);
+  }
+
+  /* ===================== 常量 ===================== */
+  const SAMPLE_DT = 1 / 30;
+  const PLAYER_R  = 9;
+  const ENEMY_R   = 11;
+  const ECHO_R    = 9;
+  const HUNT_PLAYER_R = 12;
+  const HUNT_TARGET_R = 14;
+  const HUNT_ECHO_R   = 11;
+  const HUNT_TIME_MAX = 30;
+  const HUNT_ECHO_INTERVAL = 3.5;
+  const EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Android Emoji",sans-serif';
+
+  const ITEMS = [
+    { id: 'token',  name: '替身符',   icon: '🛡️', price: 80, color: '#ffd54a',
+      desc: '死亡时自动消耗，原地复活 + 无敌 2.5 秒 + 清除附近威胁', passive: true },
+    { id: 'slow',   name: '时间缓速', icon: '⏳', price: 40, color: '#7fd8ff',
+      desc: '立即让所有追猎者速度降低 65%，持续 6 秒', passive: false },
+    { id: 'purge',  name: '回声湮灭', icon: '💠', price: 50, color: '#5ef0d8',
+      desc: '生存模式清除所有回声 / 追猎模式清除所有幻影', passive: false },
+    { id: 'shield', name: '圣光庇护', icon: '✨', price: 35, color: '#ffe27a',
+      desc: '立即获得 4 秒无敌时间', passive: false },
+    { id: 'magnet', name: '磁力脉冲', icon: '🌀', price: 60, color: '#ff8ab5',
+      desc: '清除以自身为中心 260 范围内的所有追猎者', passive: false }
+  ];
+
+  const HUNTER_SKINS = [
+    { id: 'default', code: 'DEFAULT', name: '默认红刃', price: 0,
+      desc: '经典红色三角追猎者，无附加效果',
+      palette: { fill: '#ff3b3b', fillSlow: '#ff8080', glow: '#ff3b3b', glowSlow: '#7fd8ff',
+                 halo: 'rgba(255,60,60,0.06)', edge: null },
+      effect: 'none' },
+    { id: 'ngc6611', code: 'NGC 6611', name: '鹰星云', price: 120,
+      desc: '橙红色调，三角外围漂浮着火红色的余烬微粒',
+      palette: { fill: '#ff7a3d', fillSlow: '#ffb080', glow: '#ff7a3d', glowSlow: '#7fd8ff',
+                 halo: 'rgba(255,120,60,0.09)', edge: 'rgba(255,210,170,0.85)' },
+      effect: 'ember' },
+    { id: 'ngc2237', code: 'NGC 2237', name: '玫瑰星云', price: 200,
+      desc: '玫瑰粉调，三角外围环绕着三片柔和花瓣状光晕',
+      palette: { fill: '#ff5b8a', fillSlow: '#ffa0c0', glow: '#ff5b8a', glowSlow: '#7fd8ff',
+                 halo: 'rgba(255,90,140,0.1)', edge: 'rgba(255,210,225,0.9)' },
+      effect: 'petal' },
+    { id: 'm42', code: 'M42', name: '猎户座星云', price: 280,
+      desc: '紫罗兰色，三角外围有四颗小星点环绕闪烁',
+      palette: { fill: '#a76bff', fillSlow: '#c8a0ff', glow: '#a76bff', glowSlow: '#7fd8ff',
+                 halo: 'rgba(160,110,255,0.1)', edge: 'rgba(225,205,255,0.9)' },
+      effect: 'star' },
+    { id: 'ngc7000', code: 'NGC 7000', name: '北美洲星云', price: 380,
+      desc: '青绿色调，三角外围有一圈圈向外扩散的波纹光环',
+      palette: { fill: '#5eebc8', fillSlow: '#a0f0e0', glow: '#5eebc8', glowSlow: '#7fd8ff',
+                 halo: 'rgba(90,220,200,0.1)', edge: 'rgba(200,255,240,0.9)' },
+      effect: 'wave' }
+  ];
+
+  const ICONS = [
+    { id: 'star',   emoji: '⭐', color: '#ffd54a', name: '星辰'   },
+    { id: 'fire',   emoji: '🔥', color: '#ff7a3d', name: '烈焰'   },
+    { id: 'cat',    emoji: '🐱', color: '#ffb84d', name: '橘猫'   },
+    { id: 'alien',  emoji: '👾', color: '#a76bff', name: '外星人' },
+    { id: 'rocket', emoji: '🚀', color: '#7fd8ff', name: '火箭'   },
+    { id: 'ghost',  emoji: '👻', color: '#c7d4ff', name: '幽灵'   },
+    { id: 'skull',  emoji: '💀', color: '#e8e8e8', name: '骷髅'   },
+    { id: 'eye',    emoji: '👁️', color: '#ff5b8a', name: '凝视'   },
+    { id: 'flower', emoji: '🌸', color: '#ff9ecb', name: '樱花'   },
+    { id: 'bolt',   emoji: '⚡', color: '#ffe94d', name: '闪电'   }
+  ];
+
+  const DIFFS = {
+    chill: { name: '悠闲', recordTime: 8, maxEchoes: 8, maxEnemies: 14,
+             enemyStart: 3.0, enemyMin: 1.9, enemyBase: 50, enemyMax: 180, enemyGrow: 1.8 },
+    normal: { name: '标准', recordTime: 6, maxEchoes: 12, maxEnemies: 22,
+              enemyStart: 2.0, enemyMin: 1.1, enemyBase: 62, enemyMax: 235, enemyGrow: 2.6 },
+    nightmare: { name: '噩梦', recordTime: 4, maxEchoes: 18, maxEnemies: 32,
+                 enemyStart: 1.15, enemyMin: 0.55, enemyBase: 82, enemyMax: 310, enemyGrow: 3.8 }
+  };
+
+  const MILESTONES = [15, 30, 45, 60, 90, 120, 180, 240];
+
+  // 在线模拟玩家：每人有生存最高（秒）和追猎最高（分）
+  const ONLINE_PLAYERS = [
+    { name: '夜行者', icon: '👾', best: 245.8, bestHunt: 4820, diff: '噩梦' },
+    { name: '旧梦',   icon: '🌸', best: 198.3, bestHunt: 3640, diff: '噩梦' },
+    { name: 'Zero',   icon: '🚀', best: 176.5, bestHunt: 3120, diff: '标准' },
+    { name: '碎星',   icon: '⭐', best: 152.1, bestHunt: 2580, diff: '噩梦' },
+    { name: '孤影',   icon: '👻', best: 134.7, bestHunt: 2140, diff: '标准' },
+    { name: 'Cipher', icon: '⚡', best: 118.9, bestHunt: 1820, diff: '标准' },
+    { name: '白鲸',   icon: '🐱', best: 96.4,  bestHunt: 1460, diff: '标准' },
+    { name: '萤火',   icon: '🔥', best: 78.2,  bestHunt: 980,  diff: '悠闲' },
+    { name: 'Nova',   icon: '💀', best: 62.5,  bestHunt: 720,  diff: '标准' },
+    { name: '回声',   icon: '👁️', best: 45.0,  bestHunt: 460,  diff: '悠闲' }
+  ];
+
+  /* ===================== 账户 ===================== */
+  const ACC_KEY  = 'echo_accounts_v1';
+  const CUR_KEY  = 'echo_current_v1';
+  const GUEST_ID = '__guest__';
+
+  let accounts = {};
+  let currentUser = GUEST_ID;
+
+  function hashPwd(s) {
+    let h = 5381;
+    for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
+    return 'h' + h.toString(36) + '_' + s.length;
+  }
+
+  function defaultUserData(isGuest) {
+    const inv = {};
+    ITEMS.forEach(function (it) { inv[it.id] = 0; });
+    const skins = { default: true };
+    HUNTER_SKINS.forEach(function (s) { skins[s.id] = (s.price === 0); });
+    return {
+      pwd: isGuest ? null : '', points: 40, best: 0, bestHunt: 0,
+      history: [], inventory: inv, icon: 'star', diff: 'normal',
+      skins: skins, hunterSkin: 'default'
+    };
+  }
+
+  function loadAccounts() {
+    try {
+      accounts = JSON.parse(localStorage.getItem(ACC_KEY) || '{}');
+      if (typeof accounts !== 'object' || accounts === null) accounts = {};
+    } catch (e) { accounts = {}; }
+    if (!accounts[GUEST_ID]) accounts[GUEST_ID] = defaultUserData(true);
+
+    Object.keys(accounts).forEach(function (name) {
+      const u = accounts[name];
+      if (!u.skins || typeof u.skins !== 'object') u.skins = {};
+      if (u.skins.nebula === true) u.skins.ngc6611 = true;
+      delete u.skins.nebula;
+      HUNTER_SKINS.forEach(function (s) {
+        if (typeof u.skins[s.id] !== 'boolean') u.skins[s.id] = (s.price === 0);
+      });
+      if (!u.hunterSkin || !u.skins[u.hunterSkin]) u.hunterSkin = 'default';
+      if (typeof u.bestHunt !== 'number') u.bestHunt = 0;
+    });
+
+    const saved = localStorage.getItem(CUR_KEY);
+    if (saved && accounts[saved]) currentUser = saved;
+    else currentUser = GUEST_ID;
+  }
+
+  function saveAccounts() {
+    try { localStorage.setItem(ACC_KEY, JSON.stringify(accounts)); } catch (e) {}
+  }
+  function saveCurrent() {
+    try { localStorage.setItem(CUR_KEY, currentUser); } catch (e) {}
+  }
+
+  let points = 0, best = 0, bestHunt = 0, history = [], inventory = {};
+  let chosenIcon = ICONS[0];
+  let chosenDiff = 'normal';
+  let ownedSkins = { default: true };
+  let equippedHunterSkin = 'default';
+  let gameMode = 'survive';
+  let rankTab = 'survive';     // 排行榜当前标签
+  let histTab = 'survive';     // 历史成绩当前标签
+
+  function pullUserData() {
+    const u = accounts[currentUser] || defaultUserData(currentUser === GUEST_ID);
+    points = u.points || 0;
+    best = u.best || 0;
+    bestHunt = u.bestHunt || 0;
+    history = Array.isArray(u.history) ? u.history : [];
+    if (!u.inventory || typeof u.inventory !== 'object') u.inventory = {};
+    ITEMS.forEach(function (it) {
+      if (typeof u.inventory[it.id] !== 'number') u.inventory[it.id] = 0;
+    });
+    inventory = u.inventory;
+
+    if (!u.skins || typeof u.skins !== 'object') u.skins = {};
+    ownedSkins = {};
+    HUNTER_SKINS.forEach(function (s) {
+      ownedSkins[s.id] = (s.price === 0) || !!u.skins[s.id];
+    });
+    equippedHunterSkin = (u.hunterSkin && ownedSkins[u.hunterSkin]) ? u.hunterSkin : 'default';
+
+    const foundIcon = ICONS.find(function (x) { return x.id === u.icon; });
+    chosenIcon = foundIcon || ICONS[0];
+    chosenDiff = (u.diff && DIFFS[u.diff]) ? u.diff : 'normal';
+
+    renderIconGridActive();
+    renderDiffActive();
+    renderHunterSkinGrid();
+    updateBestDisplays();
+  }
+
+  function pushUserData() {
+    if (!accounts[currentUser]) return;
+    const u = accounts[currentUser];
+    u.points = points; u.best = best; u.bestHunt = bestHunt;
+    u.history = history.slice(0, 40);   // 保留更多记录
+    u.inventory = inventory;
+    u.icon = chosenIcon.id; u.diff = chosenDiff;
+    u.skins = ownedSkins; u.hunterSkin = equippedHunterSkin;
+    saveAccounts();
+  }
+
+  function calcPoints(t) {
+    return Math.floor(t / 3) + Math.floor(t / 45) * 5;
+  }
+  function getSkinById(id) {
+    return HUNTER_SKINS.find(function (s) { return s.id === id; }) || HUNTER_SKINS[0];
+  }
+
+  /* ===================== 画布 ===================== */
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  let W = 0, H = 0, DPR = 1;
+
+  function resize() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width  = Math.floor(W * DPR);
+    canvas.height = Math.floor(H * DPR);
+    canvas.style.width  = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+    if (game) {
+      game.player.x = Math.max(PLAYER_R, Math.min(W - PLAYER_R, game.player.x));
+      game.player.y = Math.max(PLAYER_R, Math.min(H - PLAYER_R, game.player.y));
+      if (game.pointer) {
+        game.pointer.x = Math.max(0, Math.min(W, game.pointer.x));
+        game.pointer.y = Math.max(0, Math.min(H, game.pointer.y));
+      }
+    }
+  }
+
+  /* ===================== 状态 ===================== */
+  let game = null;
+  let paused = false;
+  let pausedByMenu = false;
+  let menuOpen = false;
+  let matchOpponent = null;
+
+  function newGame() {
+    const cx = W / 2, cy = H / 2;
+    return {
+      mode: 'survive',
+      cfg: DIFFS[chosenDiff], diffKey: chosenDiff,
+      icon: chosenIcon, hunterSkin: equippedHunterSkin,
+      running: true, over: false, t: 0,
+      player:  { x: cx, y: cy }, pointer: { x: cx, y: cy },
+      enemies: [], echoes: [],
+      recording: [], recAccum: 0, recTime: 0,
+      enemyTimer: 1.2, echoTotal: 0, tokenUsed: 0,
+      invincible: 0, slowTimer: 0,
+      trail: [], particles: [], toasts: [],
+      milestoneIdx: 0, shake: 0, flash: 0, deathReason: ''
+    };
+  }
+
+  function newHuntGame() {
+    const g = {
+      mode: 'hunt',
+      icon: chosenIcon, hunterSkin: equippedHunterSkin,
+      running: true, over: false, t: 0,
+      player:  { x: W / 2, y: H / 2 }, pointer: { x: W / 2, y: H / 2 },
+      target: null, echoes: [],
+      trail: [], particles: [], toasts: [],
+      shake: 0, flash: 0, invincible: 0,
+      timeLeft: HUNT_TIME_MAX, timeMax: HUNT_TIME_MAX,
+      score: 0, combo: 0, maxCombo: 1, catches: 0,
+      targetRecAccum: 0, targetRecTime: 0, targetRecording: [],
+      deathReason: ''
+    };
+    spawnHuntTarget(g, true);
+    return g;
+  }
+
+  function spawnHuntTarget(g, initial) {
+    let x, y, tries = 0;
+    if (initial) {
+      x = W * 0.72; y = H * 0.28;
+    } else {
+      do {
+        x = 80 + Math.random() * Math.max(40, W - 160);
+        y = 80 + Math.random() * Math.max(40, H - 160);
+        tries++;
+      } while (Math.hypot(x - g.player.x, y - g.player.y) < 240 && tries < 40);
+    }
+    g.target = { x: x, y: y, phase: Math.random() * 6.283, age: 0 };
+  }
+
+  /* ===================== 音效 ===================== */
+  let actx = null;
+  function initAudio() {
+    if (actx) return;
+    try { actx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch (e) { actx = null; }
+  }
+  function sfx(freq, dur, vol, type, slideTo) {
+    if (!actx) return;
+    try {
+      const t0 = actx.currentTime;
+      const o = actx.createOscillator();
+      const g = actx.createGain();
+      o.type = type || 'sine';
+      o.frequency.setValueAtTime(freq, t0);
+      if (slideTo) o.frequency.exponentialRampToValueAtTime(Math.max(20, slideTo), t0 + dur);
+      g.gain.setValueAtTime(0, t0);
+      g.gain.linearRampToValueAtTime(vol, t0 + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      o.connect(g); g.connect(actx.destination);
+      o.start(t0); o.stop(t0 + dur + 0.03);
+    } catch (e) {}
+  }
+
+  /* ===================== 工具 ===================== */
+  function hit(x1, y1, r1, x2, y2, r2) {
+    const dx = x1 - x2, dy = y1 - y2;
+    const rr = r1 + r2;
+    return dx * dx + dy * dy < rr * rr;
+  }
+
+  function burst(x, y, color, count, power) {
+    if (!game) return;
+    const pw = power || 1;
+    for (let i = 0; i < count; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const sp = (60 + Math.random() * 240) * pw;
+      game.particles.push({
+        x: x, y: y,
+        vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
+        life: 1, color: color, size: 1.4 + Math.random() * 2.6 * pw
+      });
+    }
+  }
+
+  function updateParticles(dt) {
+    const g = game;
+    if (!g) return;
+    const damp = Math.pow(0.05, dt);
+    for (let i = g.particles.length - 1; i >= 0; i--) {
+      const p = g.particles[i];
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      p.vx *= damp; p.vy *= damp;
+      p.life -= dt * 1.7;
+      if (p.life <= 0) g.particles.splice(i, 1);
+    }
+  }
+
+  /* ===================== 生存模式：敌人 ===================== */
+  function spawnEnemy(g) {
+    const edge = Math.floor(Math.random() * 4);
+    const m = 46;
+    let x, y;
+    if (edge === 0)      { x = Math.random() * W; y = -m; }
+    else if (edge === 1) { x = W + m; y = Math.random() * H; }
+    else if (edge === 2) { x = Math.random() * W; y = H + m; }
+    else                 { x = -m; y = Math.random() * H; }
+    g.enemies.push({ x: x, y: y, phase: Math.random() * 6.283 });
+  }
+
+  function updateEnemies(g, dt) {
+    const cfg = g.cfg;
+    let speed = Math.min(cfg.enemyMax, cfg.enemyBase + g.t * cfg.enemyGrow);
+    if (g.slowTimer > 0) speed *= 0.35;
+
+    for (let i = 0; i < g.enemies.length; i++) {
+      const e = g.enemies[i];
+      let dx = g.player.x - e.x, dy = g.player.y - e.y;
+      const d = Math.sqrt(dx * dx + dy * dy) || 1;
+      dx /= d; dy /= d;
+      e.phase += dt * 2.2;
+      const sway = Math.sin(e.phase) * 0.28;
+      const px = -dy, py = dx;
+      e.x += (dx + px * sway) * speed * dt;
+      e.y += (dy + py * sway) * speed * dt;
+    }
+  }
+
+  /* ===================== 替身 / 道具 ===================== */
+  function consumeToken(g) {
+    inventory.token = Math.max(0, inventory.token - 1);
+    pushUserData();
+    g.tokenUsed++;
+    updateTokenHUD();
+    refreshWallet();
+    renderQuickBar();
+
+    g.invincible = 2.5;
+    const R = 220;
+    g.enemies = g.enemies.filter(function (e) {
+      if (hit(g.player.x, g.player.y, R, e.x, e.y, ENEMY_R)) {
+        burst(e.x, e.y, '#ff3b3b', 10, 0.8); return false;
+      }
+      return true;
+    });
+    if (g.echoes) {
+      g.echoes = g.echoes.filter(function (e) {
+        if (hit(g.player.x, g.player.y, R, e.x, e.y, ECHO_R)) {
+          burst(e.x, e.y, '#5ef0d8', 10, 0.8); return false;
+        }
+        return true;
+      });
+    }
+
+    burst(g.player.x, g.player.y, '#ffd54a', 52, 1.4);
+    burst(g.player.x, g.player.y, '#ffffff', 22, 1.7);
+    g.toasts.push({ text: '替 身 替 死 ！', life: 2.2, color: '#ffd54a' });
+    g.shake = 0.7; g.flash = 0.45;
+    sfx(1200, 0.35, 0.1, 'sine', 300);
+    setTimeout(function () { sfx(880, 0.25, 0.07, 'triangle', 660); }, 120);
+  }
+
+  function useItem(id) {
+    if (!game || !game.running || game.over) return false;
+    const item = ITEMS.find(function (it) { return it.id === id; });
+    if (!item || item.passive) return false;
+    if (!inventory[id] || inventory[id] <= 0) return false;
+
+    inventory[id]--;
+    pushUserData();
+
+    if (id === 'slow') {
+      game.slowTimer = 6;
+      game.toasts.push({ text: '时间缓速 6s', life: 1.8, color: '#7fd8ff' });
+      sfx(300, 0.5, 0.08, 'sine', 180);
+    } else if (id === 'purge') {
+      const n = game.echoes.length;
+      game.echoes.forEach(function (e) { burst(e.x, e.y, '#5ef0d8', 10, 0.8); });
+      game.echoes = [];
+      if (game.targetRecording) game.targetRecording = [];
+      game.toasts.push({ text: '幻影/回声清除 × ' + n, life: 1.8, color: '#5ef0d8' });
+      sfx(1400, 0.4, 0.08, 'sine', 400);
+    } else if (id === 'shield') {
+      game.invincible = Math.max(game.invincible, 4);
+      game.toasts.push({ text: '圣光庇护 4s', life: 1.8, color: '#ffe27a' });
+      sfx(900, 0.4, 0.08, 'triangle', 1400);
+    } else if (id === 'magnet') {
+      const R = 260;
+      let removed = 0;
+      game.enemies = game.enemies.filter(function (e) {
+        if (hit(game.player.x, game.player.y, R, e.x, e.y, ENEMY_R)) {
+          burst(e.x, e.y, '#ff3b3b', 10, 0.8); removed++; return false;
+        }
+        return true;
+      });
+      game.toasts.push({ text: '磁力脉冲 · 清除 ' + removed, life: 1.8, color: '#ff8ab5' });
+      sfx(1200, 0.3, 0.08, 'sine', 800);
+    }
+
+    updateTokenHUD();
+    refreshWallet();
+    renderInventory();
+    renderQuickBar();
+    return true;
+  }
+
+  /* ===================== 快捷栏 ===================== */
+  const quickBarEl = document.getElementById('quickBar');
+
+  function renderQuickBar() {
+    if (game && game.mode === 'hunt') {
+      quickBarEl.classList.remove('show');
+      quickBarEl.innerHTML = '';
+      return;
+    }
+    const owned = ITEMS.filter(function (it) {
+      return !it.passive && (inventory[it.id] || 0) > 0;
+    });
+    const shouldShow = game && game.running && !game.over && owned.length > 0;
+    if (!shouldShow) {
+      quickBarEl.classList.remove('show');
+      quickBarEl.innerHTML = '';
+      return;
+    }
+    let html = '';
+    for (let i = 0; i < owned.length; i++) {
+      const it = owned[i];
+      html +=
+        '<button class="quick-btn" data-quick="' + it.id + '" title="' + it.name + '">' +
+          it.icon +
+          '<span class="qb-n">' + inventory[it.id] + '</span>' +
+          '<span class="qb-name">' + it.name + '</span>' +
+        '</button>';
+    }
+    quickBarEl.innerHTML = html;
+    quickBarEl.classList.add('show');
+  }
+
+  quickBarEl.addEventListener('click', function (e) {
+    const btn = e.target.closest('[data-quick]');
+    if (!btn) return;
+    e.stopPropagation();
+    if (!game || !game.running || game.over || paused) return;
+    const id = btn.dataset.quick;
+    if (useItem(id)) {
+      btn.classList.remove('flash');
+      void btn.offsetWidth;
+      btn.classList.add('flash');
+      sfx(660, 0.14, 0.05, 'triangle', 990);
+    }
+  });
+
+  /* ===================== 生存模式更新 ===================== */
+  function updateSurvive(dt) {
+    const g = game;
+    const cfg = g.cfg;
+    g.t += dt;
+
+    if (g.invincible > 0) g.invincible = Math.max(0, g.invincible - dt);
+    if (g.slowTimer > 0)  g.slowTimer  = Math.max(0, g.slowTimer - dt);
+
+    const k = Math.min(1, dt * 22);
+    g.player.x += (g.pointer.x - g.player.x) * k;
+    g.player.y += (g.pointer.y - g.player.y) * k;
+    g.player.x = Math.max(PLAYER_R, Math.min(W - PLAYER_R, g.player.x));
+    g.player.y = Math.max(PLAYER_R, Math.min(H - PLAYER_R, g.player.y));
+
+    g.trail.push({ x: g.player.x, y: g.player.y, life: 1 });
+    if (g.trail.length > 22) g.trail.shift();
+    for (let i = g.trail.length - 1; i >= 0; i--) {
+      g.trail[i].life -= dt * 3.2;
+      if (g.trail[i].life <= 0) g.trail.splice(i, 1);
+    }
+
+    g.recAccum += dt;
+    while (g.recAccum >= SAMPLE_DT) {
+      g.recAccum -= SAMPLE_DT;
+      g.recording.push(g.player.x, g.player.y);
+    }
+
+    g.recTime += dt;
+    if (g.recTime >= cfg.recordTime) {
+      g.recTime -= cfg.recordTime;
+      if (g.recording.length >= 10) {
+        g.echoes.push({
+          path: g.recording, index: 0, accum: 0,
+          x: g.recording[0], y: g.recording[1], age: 0
+        });
+        g.echoTotal++;
+        sfx(880, 0.16, 0.05, 'sine', 1400);
+        if (g.echoes.length > cfg.maxEchoes) {
+          const old = g.echoes.shift();
+          burst(old.x, old.y, '#5ef0d8', 12, 0.7);
+        }
+      }
+      g.recording = [];
+    }
+
+    g.enemyTimer -= dt;
+    if (g.enemyTimer <= 0 && g.enemies.length < cfg.maxEnemies) {
+      const gap = Math.max(cfg.enemyMin, cfg.enemyStart - g.t * 0.07);
+      g.enemyTimer = gap;
+      spawnEnemy(g);
+    }
+    updateEnemies(g, dt);
+
+    for (let i = 0; i < g.echoes.length; i++) {
+      const e = g.echoes[i];
+      e.age += dt; e.accum += dt;
+      const n = e.path.length / 2;
+      let steps = 0;
+      while (e.accum >= SAMPLE_DT && steps < 8) {
+        e.accum -= SAMPLE_DT; e.index++; steps++;
+      }
+      if (e.index >= n) e.index -= n;
+      e.x = e.path[e.index * 2];
+      e.y = e.path[e.index * 2 + 1];
+    }
+
+    updateParticles(dt);
+
+    for (let i = g.toasts.length - 1; i >= 0; i--) {
+      g.toasts[i].life -= dt;
+      if (g.toasts[i].life <= 0) g.toasts.splice(i, 1);
+    }
+
+    while (g.milestoneIdx < MILESTONES.length && g.t >= MILESTONES[g.milestoneIdx]) {
+      const m = MILESTONES[g.milestoneIdx];
+      g.toasts.push({ text: '生存 ' + m + ' 秒', life: 1.8, color: '#5ef0d8' });
+      sfx(660, 0.22, 0.05, 'triangle', 990);
+      g.milestoneIdx++;
+    }
+
+    if (g.invincible <= 0) {
+      for (let i = 0; i < g.enemies.length; i++) {
+        const e = g.enemies[i];
+        if (hit(g.player.x, g.player.y, PLAYER_R, e.x, e.y, ENEMY_R)) {
+          gameOver('被追猎者抓住了');
+          return;
+        }
+      }
+      for (let i = 0; i < g.echoes.length; i++) {
+        const e = g.echoes[i];
+        if (e.age < 0.45) continue;
+        if (hit(g.player.x, g.player.y, PLAYER_R, e.x, e.y, ECHO_R)) {
+          gameOver('被过去的自己撞死了');
+          return;
+        }
+      }
+    }
+
+    if (g.shake > 0) g.shake = Math.max(0, g.shake - dt * 4);
+    if (g.flash > 0) g.flash = Math.max(0, g.flash - dt * 2.4);
+  }
+
+  /* ===================== 追猎模式更新 ===================== */
+  function updateHunt(dt) {
+    const g = game;
+    g.t += dt;
+
+    const toPtrX = g.pointer.x - g.player.x;
+    const toPtrY = g.pointer.y - g.player.y;
+    const dist = Math.sqrt(toPtrX * toPtrX + toPtrY * toPtrY);
+    const maxSpeed = 380;
+    if (dist > 1) {
+      const speed = Math.min(maxSpeed, dist * 12);
+      g.player.x += (toPtrX / dist) * speed * dt;
+      g.player.y += (toPtrY / dist) * speed * dt;
+    }
+    g.player.x = Math.max(HUNT_PLAYER_R, Math.min(W - HUNT_PLAYER_R, g.player.x));
+    g.player.y = Math.max(HUNT_PLAYER_R, Math.min(H - HUNT_PLAYER_R, g.player.y));
+
+    g.trail.push({ x: g.player.x, y: g.player.y, life: 1 });
+    if (g.trail.length > 22) g.trail.shift();
+    for (let i = g.trail.length - 1; i >= 0; i--) {
+      g.trail[i].life -= dt * 3.2;
+      if (g.trail[i].life <= 0) g.trail.splice(i, 1);
+    }
+
+    if (g.target) {
+      g.target.age += dt;
+      const tgt = g.target;
+      let dx = tgt.x - g.player.x;
+      let dy = tgt.y - g.player.y;
+      const d = Math.sqrt(dx * dx + dy * dy) || 1;
+      dx /= d; dy /= d;
+      const speed = 180 + Math.min(220, g.catches * 25);
+
+      const margin = 100;
+      let edgeX = 0, edgeY = 0;
+      if (tgt.x < margin) edgeX = (margin - tgt.x) / margin;
+      else if (tgt.x > W - margin) edgeX = -(tgt.x - (W - margin)) / margin;
+      if (tgt.y < margin) edgeY = (margin - tgt.y) / margin;
+      else if (tgt.y > H - margin) edgeY = -(tgt.y - (H - margin)) / margin;
+
+      let vx = dx + edgeX * 1.8;
+      let vy = dy + edgeY * 1.8;
+      const vd = Math.sqrt(vx * vx + vy * vy) || 1;
+      vx /= vd; vy /= vd;
+
+      tgt.phase += dt * 3.5;
+      const sway = Math.sin(tgt.phase) * 0.4;
+      const px = -vy, py = vx;
+
+      tgt.x += (vx + px * sway) * speed * dt;
+      tgt.y += (vy + py * sway) * speed * dt;
+      tgt.x = Math.max(20, Math.min(W - 20, tgt.x));
+      tgt.y = Math.max(20, Math.min(H - 20, tgt.y));
+
+      g.targetRecAccum += dt;
+      while (g.targetRecAccum >= SAMPLE_DT) {
+        g.targetRecAccum -= SAMPLE_DT;
+        g.targetRecording.push(tgt.x, tgt.y);
+      }
+
+      g.targetRecTime += dt;
+      if (g.targetRecTime >= HUNT_ECHO_INTERVAL && g.targetRecording.length >= 10) {
+        g.targetRecTime = 0;
+        g.echoes.push({
+          path: g.targetRecording.slice(), index: 0, accum: 0,
+          x: g.targetRecording[0], y: g.targetRecording[1], age: 0
+        });
+        g.targetRecording = [];
+        if (g.echoes.length > 8) g.echoes.shift();
+        sfx(520, 0.2, 0.05, 'triangle', 780);
+      }
+    }
+
+    for (let i = 0; i < g.echoes.length; i++) {
+      const e = g.echoes[i];
+      e.age += dt; e.accum += dt;
+      const n = e.path.length / 2;
+      let steps = 0;
+      while (e.accum >= SAMPLE_DT && steps < 8) {
+        e.accum -= SAMPLE_DT; e.index++; steps++;
+      }
+      if (e.index >= n) e.index -= n;
+      e.x = e.path[e.index * 2];
+      e.y = e.path[e.index * 2 + 1];
+    }
+
+    g.timeLeft -= dt;
+    if (g.timeLeft <= 0) { g.timeLeft = 0; huntGameOver('时间耗尽了'); return; }
+
+    if (g.target && hit(g.player.x, g.player.y, HUNT_PLAYER_R, g.target.x, g.target.y, HUNT_TARGET_R)) {
+      catchTarget(g);
+    }
+
+    for (let i = g.echoes.length - 1; i >= 0; i--) {
+      const e = g.echoes[i];
+      if (e.age < 0.35) continue;
+      if (hit(g.player.x, g.player.y, HUNT_PLAYER_R, e.x, e.y, HUNT_ECHO_R)) {
+        g.timeLeft -= 3;
+        if (g.timeLeft < 0) g.timeLeft = 0;
+        burst(e.x, e.y, '#5ef0d8', 12, 0.9);
+        g.echoes.splice(i, 1);
+        g.combo = 0;
+        g.shake = 0.5; g.flash = 0.35;
+        sfx(280, 0.4, 0.1, 'sawtooth', 150);
+        g.toasts.push({ text: '-3s', life: 1.2, color: '#ff6b6b' });
+      }
+    }
+
+    updateParticles(dt);
+    for (let i = g.toasts.length - 1; i >= 0; i--) {
+      g.toasts[i].life -= dt;
+      if (g.toasts[i].life <= 0) g.toasts.splice(i, 1);
+    }
+    if (g.shake > 0) g.shake = Math.max(0, g.shake - dt * 4);
+    if (g.flash > 0) g.flash = Math.max(0, g.flash - dt * 2.4);
+
+    if (g.timeLeft <= 0) huntGameOver('时间耗尽了');
+  }
+
+  function catchTarget(g) {
+    g.catches++;
+    g.combo++;
+    if (g.combo > g.maxCombo) g.maxCombo = g.combo;
+    const gained = 100 * g.combo;
+    g.score += gained;
+    g.timeLeft = g.timeMax;
+
+    g.echoes.forEach(function (e) { burst(e.x, e.y, '#5ef0d8', 8, 0.7); });
+    g.echoes = [];
+    g.targetRecording = [];
+    g.targetRecTime = 0;
+    g.targetRecAccum = 0;
+
+    burst(g.player.x, g.player.y, '#5ef0d8', 46, 1.4);
+    burst(g.player.x, g.player.y, '#ffffff', 22, 1.6);
+    burst(g.target.x, g.target.y, '#ffd54a', 32, 1.2);
+
+    spawnHuntTarget(g, false);
+
+    g.toasts.push({ text: '捕 获 ！ ×' + g.combo + '  +' + gained, life: 2, color: '#5ef0d8' });
+    g.shake = 0.85; g.flash = 0.55;
+    sfx(880, 0.15, 0.09, 'sine', 1320);
+    setTimeout(function () { sfx(1320, 0.28, 0.08, 'sine', 1760); }, 90);
+    setTimeout(function () { sfx(1760, 0.4, 0.05, 'triangle', 880); }, 200);
+  }
+
+  /* ===================== 结束 ===================== */
+  function gameOver(reason) {
+    const g = game;
+    if (!g.running || g.over) return;
+    if (g.invincible > 0) return;
+    if (inventory.token > 0) { consumeToken(g); return; }
+    g.running = false; g.over = true;
+    g.deathReason = reason; g.shake = 1; g.flash = 1;
+    quickBarEl.classList.remove('show');
+    burst(g.player.x, g.player.y, g.icon.color, 48, 1.3);
+    burst(g.player.x, g.player.y, '#ffffff', 24, 1.6);
+    sfx(240, 0.7, 0.12, 'sawtooth', 55);
+
+    if (g.t > best) best = g.t;
+    const earned = calcPoints(g.t);
+    points += earned;
+
+    history.unshift({
+      mode: 'survive', t: g.t,
+      icon: g.icon.emoji, diff: g.cfg.name, diffKey: g.diffKey,
+      tokens: g.tokenUsed, earned: earned, date: Date.now()
+    });
+    history = history.slice(0, 40);
+    pushUserData();
+    setTimeout(function () { showEnd(earned); }, 620);
+  }
+
+  function huntGameOver(reason) {
+    const g = game;
+    if (!g.running || g.over) return;
+    g.running = false; g.over = true;
+    g.deathReason = reason; g.shake = 1; g.flash = 0.6;
+    quickBarEl.classList.remove('show');
+    const skin = getSkinById(g.hunterSkin);
+    burst(g.player.x, g.player.y, skin.palette.fill, 48, 1.3);
+    burst(g.player.x, g.player.y, '#ffffff', 22, 1.5);
+    sfx(280, 0.6, 0.1, 'sawtooth', 80);
+
+    if (g.score > bestHunt) bestHunt = g.score;
+    const earned = Math.floor(g.score / 15) + g.catches * 2;
+    points += earned;
+
+    history.unshift({
+      mode: 'hunt', t: g.catches, score: g.score,
+      catches: g.catches, maxCombo: g.maxCombo,
+      icon: g.icon.emoji, diff: '追猎', earned: earned, date: Date.now()
+    });
+    history = history.slice(0, 40);
+    pushUserData();
+    setTimeout(function () { showHuntEnd(earned); }, 620);
+  }
+
+  function showEnd(earned) {
+    const g = game;
+    if (!g) return;
+    document.getElementById('surviveEnd').style.display = '';
+    document.getElementById('huntEnd').style.display = 'none';
+
+    document.getElementById('deathEl').textContent = g.deathReason;
+    document.getElementById('finalTime').innerHTML = g.t.toFixed(1) + '<span>s</span>';
+    document.getElementById('bestLabel').textContent = '最高生存 ';
+    document.getElementById('bestEl').textContent = best.toFixed(1) + 's';
+    document.getElementById('bestEl').classList.remove('hunt-best');
+
+    let tagHtml =
+      '<span class="tag">' + g.icon.emoji + ' ' + g.icon.name + '</span>' +
+      '<span class="tag">' + g.cfg.name + '</span>';
+    if (g.tokenUsed > 0) tagHtml += '<span class="tag" style="color:#ffd54a">替身 × ' + g.tokenUsed + '</span>';
+    document.getElementById('finalTag').innerHTML = tagHtml;
+
+    document.getElementById('earnedEl').innerHTML =
+      '+' + earned + ' <span>积分</span>' +
+      '<span class="formula">存活 ' + g.t.toFixed(1) + 's · ' + Math.floor(g.t / 3) +
+      ' + 长局奖励 ' + (Math.floor(g.t / 45) * 5) + '</span>';
+
+    document.getElementById('matchResultBanner').className = 'match-result-banner';
+    document.getElementById('endScreen').classList.remove('hide');
+    refreshWallet();
+  }
+
+  function showHuntEnd(earned) {
+    const g = game;
+    if (!g) return;
+    document.getElementById('surviveEnd').style.display = 'none';
+    document.getElementById('huntEnd').style.display = 'block';
+
+    document.getElementById('deathEl').textContent = g.deathReason;
+    document.getElementById('huntFinalScore').textContent = g.score;
+    document.getElementById('huntFinalCatches').textContent = g.catches;
+    document.getElementById('huntFinalCombo').textContent = '×' + g.maxCombo;
+
+    document.getElementById('bestLabel').textContent = '最高追猎 ';
+    document.getElementById('bestEl').textContent = bestHunt + ' 分';
+    document.getElementById('bestEl').classList.add('hunt-best');
+
+    const skin = getSkinById(g.hunterSkin);
+    document.getElementById('finalTag').innerHTML =
+      '<span class="tag hunt">⚔️ 追猎模式</span>' +
+      '<span class="tag">' + skin.name + '</span>';
+
+    document.getElementById('earnedEl').innerHTML =
+      '+' + earned + ' <span>积分</span>' +
+      '<span class="formula">分数 ' + g.score + ' / 15 + 捕获 ' + g.catches + ' × 2</span>';
+
+    document.getElementById('matchResultBanner').className = 'match-result-banner';
+    document.getElementById('endScreen').classList.remove('hide');
+    refreshWallet();
+  }
+
+  /* ===================== 渲染 ===================== */
+  function drawGrid() {
+    const grid = 44;
+    ctx.strokeStyle = getTheme().gridColor;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let x = 0; x <= W; x += grid) { ctx.moveTo(x, 0); ctx.lineTo(x, H); }
+    for (let y = 0; y <= H; y += grid) { ctx.moveTo(0, y); ctx.lineTo(W, y); }
+    ctx.stroke();
+  }
+
+  function drawTrail() {
+    const tr = game.trail;
+    if (!tr) return;
+    let col = game.icon ? game.icon.color : '#5fa8ff';
+    if (game.mode === 'hunt') {
+      const sk = getSkinById(game.hunterSkin);
+      col = sk.palette.fill;
+    }
+    const n = parseInt(col.slice(1), 16);
+    const r = (n >> 16) & 255, g2 = (n >> 8) & 255, b = n & 255;
+    for (let i = 0; i < tr.length; i++) {
+      const t = tr[i];
+      const a = (i / tr.length) * 0.42 * t.life;
+      if (a <= 0.01) continue;
+      ctx.beginPath();
+      ctx.arc(t.x, t.y, PLAYER_R * 0.8 * t.life, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(' + r + ',' + g2 + ',' + b + ',' + a + ')';
+      ctx.fill();
+    }
+  }
+
+  function drawEchoes() {
+    const g = game;
+    const emoji = g.icon.emoji;
+    for (let i = 0; i < g.echoes.length; i++) {
+      const e = g.echoes[i];
+      const fade = Math.min(1, e.age / 0.6);
+      const pulse = 0.62 + Math.sin(e.age * 4.2) * 0.38;
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, ECHO_R * 3.2, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(94,240,216,' + (0.05 * fade) + ')';
+      ctx.fill();
+      ctx.save();
+      ctx.globalAlpha = (0.72 + pulse * 0.2) * fade;
+      ctx.font = '20px ' + EMOJI_FONT;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = '#5ef0d8';
+      ctx.shadowBlur = 20;
+      ctx.fillText(emoji, e.x, e.y + 1);
+      ctx.restore();
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, ECHO_R + 3, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(94,240,216,' + (0.55 * fade * pulse) + ')';
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+    }
+  }
+
+  function drawHuntEchoes() {
+    const g = game;
+    const emoji = g.icon.emoji;
+    for (let i = 0; i < g.echoes.length; i++) {
+      const e = g.echoes[i];
+      const fade = Math.min(1, e.age / 0.5);
+      const pulse = 0.6 + Math.sin(e.age * 4) * 0.4;
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, HUNT_ECHO_R * 3, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(94,240,216,' + (0.08 * fade) + ')';
+      ctx.fill();
+      ctx.save();
+      ctx.globalAlpha = (0.6 + pulse * 0.22) * fade;
+      ctx.font = '18px ' + EMOJI_FONT;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = '#5ef0d8';
+      ctx.shadowBlur = 16;
+      ctx.fillText(emoji, e.x, e.y + 1);
+      ctx.restore();
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, HUNT_ECHO_R + 3, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(94,240,216,' + (0.5 * fade * pulse) + ')';
+      ctx.lineWidth = 1.3;
+      ctx.stroke();
+    }
+  }
+
+  function drawHuntTarget() {
+    const g = game;
+    const t = g.target;
+    if (!t) return;
+    const ic = g.icon;
+    const n = parseInt(ic.color.slice(1), 16);
+    const r = (n >> 16) & 255, g2 = (n >> 8) & 255, b = n & 255;
+    ctx.beginPath();
+    ctx.arc(t.x, t.y, HUNT_TARGET_R * 3.5, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(' + r + ',' + g2 + ',' + b + ',0.14)';
+    ctx.fill();
+    const pulse = 0.5 + Math.sin(g.t * 3) * 0.5;
+    ctx.beginPath();
+    ctx.arc(t.x, t.y, HUNT_TARGET_R * 1.8 + pulse * 10, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(' + r + ',' + g2 + ',' + b + ',' + (0.3 + pulse * 0.3) + ')';
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+    ctx.save();
+    ctx.font = '23px ' + EMOJI_FONT;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = ic.color;
+    ctx.shadowBlur = 22;
+    ctx.fillText(ic.emoji, t.x, t.y + 1);
+    ctx.restore();
+  }
+
+  function drawHunterEffect(effect, t, i, r, pal, slowA) {
+    if (effect === 'none') return;
+    const sMul = slowA ? 0.4 : 1;
+    if (effect === 'ember') {
+      for (let k = 0; k < 4; k++) {
+        const phase = t * 0.8 * sMul + k * Math.PI / 2 + i * 0.7;
+        const baseR = r * 1.5;
+        const drift = Math.sin(phase * 1.3) * r * 0.5;
+        const dist = baseR + drift;
+        const x = Math.cos(phase) * dist;
+        const y = Math.sin(phase) * dist - Math.sin(phase * 0.7) * 2.5;
+        const a = 0.35 + Math.sin(t * 3 + k * 2) * 0.3;
+        const size = 1.3 + Math.sin(t * 2.5 + k * 1.3) * 0.4;
+        if (a <= 0) continue;
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,190,120,' + a + ')';
+        ctx.shadowColor = '#ff9040';
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    } else if (effect === 'petal') {
+      ctx.save();
+      ctx.rotate(t * 0.45 * sMul + i);
+      for (let k = 0; k < 3; k++) {
+        ctx.save();
+        ctx.rotate(k * Math.PI * 2 / 3);
+        ctx.beginPath();
+        ctx.ellipse(0, -r * 1.6, r * 0.5, r * 0.85, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,150,195,0.24)';
+        ctx.shadowColor = '#ff7fb8';
+        ctx.shadowBlur = 10;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.restore();
+      }
+      ctx.restore();
+    } else if (effect === 'star') {
+      ctx.save();
+      ctx.rotate(t * 0.6 * sMul + i * 1.3);
+      for (let k = 0; k < 4; k++) {
+        const ang = k * Math.PI / 2 + i;
+        const dist = r * (1.65 + Math.sin(t * 2 + k * 1.9) * 0.28);
+        const x = Math.cos(ang) * dist;
+        const y = Math.sin(ang) * dist;
+        const tw = 0.5 + Math.sin(t * 4.5 + k * 1.7) * 0.5;
+        const sr = 1.3 + tw * 1.1;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(t * 1.2 + k);
+        ctx.beginPath();
+        ctx.moveTo(-sr, 0); ctx.lineTo(sr, 0);
+        ctx.moveTo(0, -sr); ctx.lineTo(0, sr);
+        ctx.strokeStyle = 'rgba(225,205,255,' + (0.5 + tw * 0.45) + ')';
+        ctx.lineWidth = 1.1;
+        ctx.shadowColor = '#b48cff';
+        ctx.shadowBlur = 6;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.restore();
+      }
+      ctx.restore();
+    } else if (effect === 'wave') {
+      for (let k = 0; k < 3; k++) {
+        const waveProgress = ((t * 0.55 + k * 0.33 + i * 0.15) % 1);
+        const waveR = r * (1.0 + waveProgress * 2.2);
+        const waveA = (1 - waveProgress) * 0.55;
+        if (waveA <= 0.02) continue;
+        ctx.beginPath();
+        ctx.arc(0, 0, waveR, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(130,240,215,' + waveA + ')';
+        ctx.lineWidth = 1.3;
+        ctx.stroke();
+      }
+    }
+  }
+
+  function drawHunterShape(x, y, radius, skin, rotation, slowA, skinIndex) {
+    const pal = skin.palette;
+    ctx.save();
+    ctx.translate(x, y);
+
+    ctx.beginPath();
+    ctx.arc(0, 0, radius * 3, 0, Math.PI * 2);
+    ctx.fillStyle = pal.halo;
+    ctx.fill();
+
+    drawHunterEffect(skin.effect, game.t, skinIndex || 0, radius, pal, slowA);
+
+    ctx.save();
+    ctx.rotate(rotation);
+    const r = radius;
+    ctx.beginPath();
+    ctx.moveTo(0, -r);
+    ctx.lineTo(r, 0);
+    ctx.lineTo(0, r);
+    ctx.lineTo(-r, 0);
+    ctx.closePath();
+    ctx.fillStyle = slowA ? pal.fillSlow : pal.fill;
+    ctx.shadowColor = slowA ? pal.glowSlow : pal.glow;
+    ctx.shadowBlur = 16;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    if (pal.edge) {
+      ctx.strokeStyle = pal.edge;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    if (slowA) {
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 2.4, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(127,216,255,0.35)';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawEnemies() {
+    const g = game;
+    const slowA = g.slowTimer > 0;
+    const skin = getSkinById(g.hunterSkin || 'default');
+    for (let i = 0; i < g.enemies.length; i++) {
+      const e = g.enemies[i];
+      const rot = g.t * (slowA ? 0.5 : 1.3) + i;
+      drawHunterShape(e.x, e.y, ENEMY_R, skin, rot, slowA, i);
+    }
+  }
+
+  function drawPlayer() {
+    const p = game.player;
+    const ic = game.icon;
+    const n = parseInt(ic.color.slice(1), 16);
+    const r = (n >> 16) & 255, g2 = (n >> 8) & 255, b = n & 255;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, PLAYER_R * 3.8, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(' + r + ',' + g2 + ',' + b + ',0.09)';
+    ctx.fill();
+    if (game.invincible > 0) {
+      const pulse = 0.5 + Math.sin(game.t * 20) * 0.5;
+      const fade = Math.min(1, game.invincible / 0.6);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, PLAYER_R * 4.6, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255,213,74,' + (pulse * 0.85 * fade) + ')';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, PLAYER_R * 6.2, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255,213,74,' + (pulse * 0.3 * fade) + ')';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+    ctx.save();
+    ctx.font = '21px ' + EMOJI_FONT;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = ic.color;
+    ctx.shadowBlur = 22;
+    ctx.fillText(ic.emoji, p.x, p.y + 1);
+    ctx.restore();
+  }
+
+  function drawHuntPlayer() {
+    const g = game;
+    const skin = getSkinById(g.hunterSkin);
+    const rot = g.t * 1.6;
+    drawHunterShape(g.player.x, g.player.y, HUNT_PLAYER_R, skin, rot, false, 0);
+    const pulse = 0.5 + Math.sin(g.t * 4) * 0.5;
+    ctx.beginPath();
+    ctx.arc(g.player.x, g.player.y, HUNT_PLAYER_R * 2.6 + pulse * 4, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255,255,255,' + (0.18 + pulse * 0.22) + ')';
+    ctx.lineWidth = 1.3;
+    ctx.stroke();
+  }
+
+  function drawParticles() {
+    const ps = game.particles;
+    for (let i = 0; i < ps.length; i++) {
+      const p = ps[i];
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, Math.max(0.1, p.size * p.life), 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawToasts() {
+    const g = game;
+    if (!g.toasts.length) return;
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    for (let i = 0; i < g.toasts.length; i++) {
+      const t = g.toasts[i];
+      const a = Math.min(1, t.life / 0.5);
+      const rise = (2.2 - t.life) * 32;
+      ctx.globalAlpha = a;
+      ctx.font = 'bold 22px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
+      ctx.fillStyle = t.color || '#fff';
+      ctx.shadowColor = t.color || '#5fa8ff';
+      ctx.shadowBlur = 22;
+      ctx.fillText(t.text, W / 2, H * 0.26 - rise);
+    }
+    ctx.restore();
+  }
+
+  function renderSurvive() {
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.fillStyle = getTheme().canvasBg;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.save();
+    if (game && game.shake > 0) {
+      ctx.translate(
+        (Math.random() - 0.5) * 20 * game.shake,
+        (Math.random() - 0.5) * 20 * game.shake
+      );
+    }
+    drawGrid();
+    if (game) {
+      drawTrail();
+      drawEchoes();
+      drawEnemies();
+      if (game.running) drawPlayer();
+      drawParticles();
+      drawToasts();
+    }
+    ctx.restore();
+
+    const th = getTheme();
+    if (game && game.flash > 0) {
+      ctx.fillStyle = 'rgba(' + th.flashRGB + ',' + (game.flash * 0.35) + ')';
+      ctx.fillRect(0, 0, W, H);
+    }
+    if (game && game.running && !paused) {
+      const warn = game.cfg.recordTime - 1;
+      if (game.recTime > warn) {
+        const a = Math.min(0.34, (game.recTime - warn) * 0.34);
+        ctx.strokeStyle = 'rgba(' + th.warnBorderRGB + ',' + a + ')';
+        ctx.lineWidth = 5;
+        ctx.strokeRect(2.5, 2.5, W - 5, H - 5);
+      }
+    }
+  }
+
+  function renderHunt() {
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    ctx.fillStyle = getTheme().canvasBg;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.save();
+    if (game && game.shake > 0) {
+      ctx.translate(
+        (Math.random() - 0.5) * 20 * game.shake,
+        (Math.random() - 0.5) * 20 * game.shake
+      );
+    }
+    drawGrid();
+    if (game) {
+      drawTrail();
+      drawHuntEchoes();
+      if (game.target) drawHuntTarget();
+      if (game.running) drawHuntPlayer();
+      drawParticles();
+      drawToasts();
+    }
+    ctx.restore();
+
+    if (game && game.flash > 0) {
+      ctx.fillStyle = 'rgba(94,240,216,' + (game.flash * 0.35) + ')';
+      ctx.fillRect(0, 0, W, H);
+    }
+    if (game && game.running && !paused && game.timeLeft < 5) {
+      const a = (Math.sin(game.t * 12) * 0.5 + 0.5) * 0.4;
+      ctx.strokeStyle = 'rgba(255,60,60,' + a + ')';
+      ctx.lineWidth = 5;
+      ctx.strokeRect(2.5, 2.5, W - 5, H - 5);
+    }
+  }
+
+  function render() {
+    if (game && game.mode === 'hunt') return renderHunt();
+    return renderSurvive();
+  }
+
+  /* ===================== HUD ===================== */
+  let hudTimer = 0;
+  const timeEl  = document.getElementById('timeEl');
+  const echoEl  = document.getElementById('echoEl');
+  const enemyEl = document.getElementById('enemyEl');
+  const tokenHudEl = document.getElementById('tokenHud');
+  const matchTargetHud = document.getElementById('matchTargetHud');
+  const matchTargetHudVal = document.getElementById('matchTargetHudVal');
+  const huntTimeEl = document.getElementById('huntTimeEl');
+  const huntCatchEl = document.getElementById('huntCatchEl');
+  const huntComboEl = document.getElementById('huntComboEl');
+  const huntScoreEl = document.getElementById('huntScoreEl');
+
+  function updateTokenHUD() {
+    const n = inventory.token || 0;
+    tokenHudEl.innerHTML = '替身 × <b>' + n + '</b>';
+    tokenHudEl.style.opacity = n > 0 ? '1' : '0.35';
+  }
+
+  function updateHUD(dt) {
+    hudTimer -= dt;
+    if (hudTimer > 0) return;
+    hudTimer = 0.06;
+
+    if (!game) return;
+
+    if (game.mode === 'hunt') {
+      huntTimeEl.innerHTML = Math.max(0, game.timeLeft).toFixed(1) + '<span>s</span>';
+      huntTimeEl.classList.toggle('low', game.timeLeft < 5);
+      huntCatchEl.textContent = game.catches;
+      huntComboEl.textContent = '×' + Math.max(1, game.combo);
+      huntScoreEl.textContent = game.score;
+      return;
+    }
+
+    timeEl.innerHTML = game.t.toFixed(1) + '<span>s</span>';
+    echoEl.textContent  = game.echoes.length;
+    enemyEl.textContent = game.enemies.length;
+    if (matchOpponent) {
+      matchTargetHud.classList.add('show');
+      matchTargetHudVal.textContent = matchOpponent.target.toFixed(1) + 's';
+    } else {
+      matchTargetHud.classList.remove('show');
+    }
+  }
+
+  /* ===================== 主循环 ===================== */
+  let last = 0;
+  function loop(now) {
+    requestAnimationFrame(loop);
+    if (!last) { last = now; return; }
+    let dt = (now - last) / 1000;
+    last = now;
+    if (dt > 0.05) dt = 0.05;
+    if (dt < 0) dt = 0;
+
+    if (game && game.running && !paused) {
+      if (game.mode === 'hunt') updateHunt(dt);
+      else updateSurvive(dt);
+      if (game.running) updateHUD(dt);
+    } else if (game && game.over) {
+      updateParticles(dt);
+      if (game.shake > 0) game.shake = Math.max(0, game.shake - dt * 4);
+      if (game.flash > 0) game.flash = Math.max(0, game.flash - dt * 2.4);
+    }
+
+    render();
+  }
+
+  /* ===================== 输入 ===================== */
+  function setPointer(x, y) {
+    if (!game || !game.running || paused) return;
+    game.pointer.x = x;
+    game.pointer.y = y;
+  }
+
+  window.addEventListener('pointermove', function (e) { setPointer(e.clientX, e.clientY); }, { passive: true });
+  window.addEventListener('pointerdown', function (e) { setPointer(e.clientX, e.clientY); }, { passive: true });
+  window.addEventListener('touchmove', function (e) {
+    if (e.touches.length > 0) setPointer(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+  window.addEventListener('resize', resize);
+
+  /* ===================== 界面元素 ===================== */
+  const startScreen     = document.getElementById('startScreen');
+  const pauseScreen     = document.getElementById('pauseScreen');
+  const endScreen       = document.getElementById('endScreen');
+  const historyScreen   = document.getElementById('historyScreen');
+  const loginScreen     = document.getElementById('loginScreen');
+  const rankScreen      = document.getElementById('rankScreen');
+  const matchScreen     = document.getElementById('matchScreen');
+  const skinShopScreen  = document.getElementById('skinShopScreen');
+
+  const pointsEl   = document.getElementById('pointsEl');
+  const tokensEl   = document.getElementById('tokensEl');
+  const historyListEl = document.getElementById('historyList');
+
+  const menuDrawer   = document.getElementById('menuDrawer');
+  const menuBackdrop = document.getElementById('menuBackdrop');
+  const menuToggle   = document.getElementById('menuToggle');
+  const menuClose    = document.getElementById('menuClose');
+  const menuPoints   = document.getElementById('menuPoints');
+  const shopList     = document.getElementById('shopList');
+  const invList      = document.getElementById('invList');
+  const skinListFull = document.getElementById('skinListFull');
+  const skinShopPoints = document.getElementById('skinShopPoints');
+  const surviveHud   = document.getElementById('surviveHud');
+  const huntHud      = document.getElementById('huntHud');
+  const playerSkinSection = document.getElementById('playerSkinSection');
+  const hunterSkinSection = document.getElementById('hunterSkinSection');
+  const hunterSkinGrid = document.getElementById('hunterSkinGrid');
+
+  /* ---------- 最高成绩显示更新 ---------- */
+  function updateBestDisplays() {
+    // 首页模式按钮下方的最高成绩
+    const modeBestSurvive = document.getElementById('modeBestSurvive');
+    const modeBestHunt = document.getElementById('modeBestHunt');
+    if (best > 0) {
+      modeBestSurvive.textContent = '最高 ' + best.toFixed(1) + 's';
+      modeBestSurvive.classList.remove('empty');
+    } else {
+      modeBestSurvive.textContent = '暂无记录';
+      modeBestSurvive.classList.add('empty');
+    }
+    if (bestHunt > 0) {
+      modeBestHunt.textContent = '最高 ' + bestHunt + '分';
+      modeBestHunt.classList.remove('empty');
+    } else {
+      modeBestHunt.textContent = '暂无记录';
+      modeBestHunt.classList.add('empty');
+    }
+
+    // 账户卡片里的两个最高成绩
+    document.getElementById('accountBestSurvive').textContent = best > 0 ? best.toFixed(1) + 's' : '—';
+    document.getElementById('accountBestHunt').textContent = bestHunt > 0 ? bestHunt + '分' : '—';
+  }
+
+  function refreshWallet() {
+    pointsEl.textContent = points;
+    tokensEl.textContent = inventory.token || 0;
+    menuPoints.textContent = points;
+    skinShopPoints.textContent = points;
+
+    const isGuest = currentUser === GUEST_ID;
+    const u = accounts[currentUser];
+    document.getElementById('accountGuest').style.display = isGuest ? 'flex' : 'none';
+    document.getElementById('accountUser').classList.toggle('hide', isGuest);
+    if (!isGuest && u) {
+      document.getElementById('accountAvatar').textContent = chosenIcon.emoji;
+      document.getElementById('accountName').textContent = currentUser;
+    }
+    updateBestDisplays();
+  }
+
+  /* ---------- 追捕者皮肤网格 ---------- */
+  function renderHunterSkinGrid() {
+    let html = '';
+    for (let i = 0; i < HUNTER_SKINS.length; i++) {
+      const sk = HUNTER_SKINS[i];
+      const owned = !!ownedSkins[sk.id];
+      const equipped = equippedHunterSkin === sk.id;
+      const cls = 'hunter-skin-btn' +
+        (equipped ? ' active' : '') +
+        (!owned ? ' locked' : '');
+      html +=
+        '<button class="' + cls + '" data-skin="' + sk.id + '" data-owned="' + (owned ? '1' : '0') + '" title="' + sk.name + '">' +
+          (!owned ? '<span class="hs-lock">🔒</span>' : '') +
+          '<div class="hs-tri"></div>' +
+          '<span class="hs-name">' + sk.name + '</span>' +
+        '</button>';
+    }
+    hunterSkinGrid.innerHTML = html;
+  }
+
+  hunterSkinGrid.addEventListener('click', function (e) {
+    const btn = e.target.closest('.hunter-skin-btn');
+    if (!btn) return;
+    const id = btn.dataset.skin;
+    const owned = btn.dataset.owned === '1';
+    if (!owned) { openSkinShop(); return; }
+    if (equippedHunterSkin === id) return;
+    equippedHunterSkin = id;
+    pushUserData();
+    renderHunterSkinGrid();
+    sfx(600, 0.15, 0.05, 'sine', 880);
+  });
+
+  function updateSkinSectionVisibility() {
+    if (gameMode === 'hunt') {
+      playerSkinSection.style.display = 'none';
+      hunterSkinSection.style.display = '';
+    } else {
+      playerSkinSection.style.display = '';
+      hunterSkinSection.style.display = 'none';
+    }
+  }
+
+  /* ---------- 皮肤商店 ---------- */
+  function renderSkinShop() {
+    let html = '';
+    for (let i = 0; i < HUNTER_SKINS.length; i++) {
+      const sk = HUNTER_SKINS[i];
+      const owned = !!ownedSkins[sk.id];
+      const equipped = equippedHunterSkin === sk.id;
+      const canBuy = points >= sk.price;
+
+      let priceHtml = '';
+      if (sk.price === 0) {
+        priceHtml = '<span class="skin-price free">免费</span>';
+      } else {
+        priceHtml = '<span class="skin-price">' + sk.price + ' <span>分</span></span>';
+      }
+
+      let ownedHtml = '';
+      if (owned) {
+        ownedHtml = '<span class="skin-owned' + (equipped ? ' equipped' : '') + '">' +
+          (equipped ? '使用中' : '已拥有') + '</span>';
+      }
+
+      let btnHtml = '';
+      if (!owned) {
+        btnHtml = '<button class="skin-action" data-buy-skin="' + sk.id + '"' +
+          (canBuy ? '' : ' disabled') + '>' +
+          (canBuy ? '购 买' : '积分不足') + '</button>';
+      } else if (equipped) {
+        btnHtml = '<button class="skin-action equipped" disabled>已装备</button>';
+      } else {
+        btnHtml = '<button class="skin-action blue" data-equip-skin="' + sk.id + '">装 备</button>';
+      }
+
+      const itemCls = 'skin-item' +
+        (equipped ? ' equipped' : '') +
+        (!owned && !canBuy ? ' locked' : '');
+
+      html +=
+        '<div class="' + itemCls + '">' +
+          '<div class="skin-preview" data-skin="' + sk.id + '"><div class="tri"></div></div>' +
+          '<div class="skin-body">' +
+            '<div class="skin-name">' + sk.name +
+              '<span class="skin-code">' + sk.code + '</span>' +
+            '</div>' +
+            '<div class="skin-desc">' + sk.desc + '</div>' +
+            '<div class="skin-meta">' + priceHtml + ownedHtml + '</div>' +
+          '</div>' +
+          btnHtml +
+        '</div>';
+    }
+    skinListFull.innerHTML = html;
+  }
+
+  function renderShop() {
+    let html = '';
+    for (let i = 0; i < ITEMS.length; i++) {
+      const it = ITEMS[i];
+      const canBuy = points >= it.price;
+      const owned = inventory[it.id] || 0;
+      const countBadge = owned > 0 ? '<span class="item-count">× ' + owned + '</span>' : '';
+      const locked = !canBuy;
+      html +=
+        '<div class="item-card' + (locked ? ' locked' : '') + '">' +
+          '<div class="item-icon">' + it.icon + '</div>' +
+          '<div class="item-info">' +
+            '<div class="item-name">' + it.name + countBadge + '</div>' +
+            '<div class="item-desc">' + it.desc + '</div>' +
+            '<div class="item-price">' + it.price + ' <span>分</span></div>' +
+          '</div>' +
+          '<button class="item-action" data-buy="' + it.id + '"' +
+            (locked ? ' disabled' : '') + '>' +
+            (locked ? '积分不足' : '购 买') +
+          '</button>' +
+        '</div>';
+    }
+    shopList.innerHTML = html;
+  }
+
+  function renderInventory() {
+    const ownedItems = ITEMS.filter(function (it) {
+      return (inventory[it.id] || 0) > 0;
+    });
+    if (!ownedItems.length) {
+      invList.innerHTML = '<div class="inv-empty">空空如也<br>去商店买点道具吧</div>';
+      return;
+    }
+    const canUse = game && game.running && !game.over;
+    let html = '';
+    for (let i = 0; i < ownedItems.length; i++) {
+      const it = ownedItems[i];
+      const n = inventory[it.id];
+      const usable = canUse && !it.passive;
+      const cls = usable ? 'item-card usable' : 'item-card';
+      const btnLabel = it.passive ? '自动' : (usable ? '使用' : '未开始');
+      html +=
+        '<div class="' + cls + '"' + (usable ? ' data-use="' + it.id + '"' : '') + '>' +
+          '<div class="item-icon">' + it.icon + '</div>' +
+          '<div class="item-info">' +
+            '<div class="item-name">' + it.name +
+              '<span class="item-count">× ' + n + '</span>' +
+            '</div>' +
+            '<div class="item-desc">' + (it.passive ? '死亡时自动消耗' : it.desc) + '</div>' +
+          '</div>' +
+          '<button class="item-action blue" disabled>' + btnLabel + '</button>' +
+        '</div>';
+    }
+    invList.innerHTML = html;
+  }
+
+  shopList.addEventListener('click', function (e) {
+    const btn = e.target.closest('[data-buy]');
+    if (!btn) return;
+    const id = btn.dataset.buy;
+    const it = ITEMS.find(function (x) { return x.id === id; });
+    if (!it) return;
+    if (points < it.price) return;
+    points -= it.price;
+    inventory[it.id] = (inventory[it.id] || 0) + 1;
+    pushUserData();
+    refreshWallet();
+    renderShop();
+    renderInventory();
+    updateTokenHUD();
+    renderQuickBar();
+    sfx(880, 0.16, 0.07, 'sine', 1320);
+    setTimeout(function () { sfx(1180, 0.14, 0.05, 'sine', 1560); }, 100);
+  });
+
+  invList.addEventListener('click', function (e) {
+    const card = e.target.closest('[data-use]');
+    if (!card) return;
+    const id = card.dataset.use;
+    if (useItem(id)) sfx(660, 0.14, 0.05, 'triangle', 990);
+  });
+
+  skinListFull.addEventListener('click', function (e) {
+    const buyBtn = e.target.closest('[data-buy-skin]');
+    if (buyBtn) {
+      const id = buyBtn.dataset.buySkin;
+      const sk = getSkinById(id);
+      if (!sk || ownedSkins[id]) return;
+      if (points < sk.price) return;
+      points -= sk.price;
+      ownedSkins[id] = true;
+      equippedHunterSkin = id;
+      pushUserData();
+      refreshWallet();
+      renderSkinShop();
+      renderShop();
+      renderHunterSkinGrid();
+      sfx(660, 0.2, 0.07, 'sine', 1320);
+      setTimeout(function () { sfx(990, 0.3, 0.06, 'sine', 1760); }, 120);
+      setTimeout(function () { sfx(1320, 0.4, 0.05, 'triangle', 660); }, 260);
+      return;
+    }
+    const equipBtn = e.target.closest('[data-equip-skin]');
+    if (equipBtn) {
+      const id = equipBtn.dataset.equipSkin;
+      if (!ownedSkins[id]) return;
+      if (equippedHunterSkin === id) return;
+      equippedHunterSkin = id;
+      pushUserData();
+      renderSkinShop();
+      renderHunterSkinGrid();
+      if (game) game.hunterSkin = equippedHunterSkin;
+      sfx(600, 0.15, 0.05, 'sine', 880);
+    }
+  });
+
+  /* ===================== 主题按钮 ===================== */
+  document.getElementById('themeSwitch').addEventListener('click', function (e) {
+    const btn = e.target.closest('.theme-btn');
+    if (!btn) return;
+    const key = btn.dataset.theme;
+    if (key === currentThemeKey) return;
+    setTheme(key);
+    sfx(560, 0.12, 0.04, 'sine', 720);
+  });
+
+  /* ===================== 模式切换 ===================== */
+  const storySurvive = document.getElementById('storySurvive');
+  const storyHunt = document.getElementById('storyHunt');
+
+  document.getElementById('modeSwitch').addEventListener('click', function (e) {
+    const btn = e.target.closest('.mode-btn');
+    if (!btn) return;
+    const m = btn.dataset.mode;
+    if (m === gameMode) return;
+    gameMode = m;
+    document.querySelectorAll('.mode-btn').forEach(function (b) {
+      b.classList.toggle('active', b === btn);
+    });
+    storySurvive.style.display = (gameMode === 'survive') ? '' : 'none';
+    storyHunt.style.display = (gameMode === 'hunt') ? '' : 'none';
+    updateSkinSectionVisibility();
+    sfx(620, 0.1, 0.04, 'sine', 780);
+  });
+
+  /* ===================== 菜单 ===================== */
+  function openMenu() {
+    if (menuOpen) return;
+    menuOpen = true;
+    menuDrawer.classList.add('open');
+    menuBackdrop.classList.add('show');
+    refreshWallet();
+    renderShop();
+    renderInventory();
+    if (game && game.running && !game.over && !paused) {
+      paused = true;
+      pausedByMenu = true;
+      pauseScreen.classList.add('hide');
+    }
+  }
+
+  function closeMenu() {
+    if (!menuOpen) return;
+    menuOpen = false;
+    menuDrawer.classList.remove('open');
+    menuBackdrop.classList.remove('show');
+    if (pausedByMenu) {
+      paused = false;
+      pausedByMenu = false;
+      last = 0;
+    }
+  }
+
+  menuToggle.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (menuOpen) closeMenu();
+    else openMenu();
+  });
+  menuClose.addEventListener('click', closeMenu);
+  menuBackdrop.addEventListener('click', closeMenu);
+
+  /* ===================== 皮肤商店页面 ===================== */
+  function openSkinShop() {
+    closeMenu();
+    renderSkinShop();
+    refreshWallet();
+    startScreen.classList.add('hide');
+    skinShopScreen.classList.remove('hide');
+    sfx(600, 0.12, 0.04, 'sine', 780);
+  }
+  function closeSkinShop() {
+    skinShopScreen.classList.add('hide');
+    startScreen.classList.remove('hide');
+    renderHunterSkinGrid();
+    sfx(440, 0.12, 0.04, 'sine', 330);
+  }
+  document.getElementById('openSkinShopBtn').addEventListener('click', openSkinShop);
+  document.getElementById('closeSkinShopBtn').addEventListener('click', closeSkinShop);
+  document.getElementById('skinShopBackBtn').addEventListener('click', closeSkinShop);
+
+  /* ===================== 登录 ===================== */
+  const authUserInput = document.getElementById('authUser');
+  const authPwdInput  = document.getElementById('authPwd');
+  const authMsg       = document.getElementById('authMsg');
+  const authSubmit    = document.getElementById('authSubmit');
+  let authMode = 'login';
+
+  document.querySelectorAll('.auth-tab').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      authMode = btn.dataset.auth;
+      document.querySelectorAll('.auth-tab').forEach(function (b) {
+        b.classList.toggle('active', b === btn);
+      });
+      authSubmit.textContent = authMode === 'login' ? '登 录' : '注 册';
+      authMsg.textContent = '';
+      authMsg.className = 'auth-msg';
+      sfx(520, 0.09, 0.03, 'sine');
+    });
+  });
+
+  function showAuthMsg(text, ok) {
+    authMsg.textContent = text;
+    authMsg.className = 'auth-msg' + (ok ? ' ok' : '');
+  }
+
+  document.getElementById('openLoginBtn').addEventListener('click', function () {
+    authMode = 'login';
+    document.querySelectorAll('.auth-tab').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.auth === 'login');
+    });
+    authSubmit.textContent = '登 录';
+    authUserInput.value = '';
+    authPwdInput.value = '';
+    authMsg.textContent = '';
+    authMsg.className = 'auth-msg';
+    closeMenu();
+    startScreen.classList.add('hide');
+    loginScreen.classList.remove('hide');
+    sfx(600, 0.12, 0.04, 'sine', 780);
+  });
+
+  document.getElementById('closeLoginBtn').addEventListener('click', function () {
+    loginScreen.classList.add('hide');
+    startScreen.classList.remove('hide');
+    sfx(440, 0.12, 0.04, 'sine', 330);
+  });
+
+  authSubmit.addEventListener('click', function () {
+    const name = (authUserInput.value || '').trim();
+    const pwd  = authPwdInput.value || '';
+    if (name.length < 2 || name.length > 12) { showAuthMsg('账号需 2 - 12 个字符'); return; }
+    if (name === '游客') { showAuthMsg('该名称不可用'); return; }
+    if (pwd.length < 4) { showAuthMsg('密码至少 4 个字符'); return; }
+
+    if (authMode === 'register') {
+      if (accounts[name]) { showAuthMsg('该账号已被注册'); return; }
+      const data = defaultUserData(false);
+      data.pwd = hashPwd(pwd);
+      accounts[name] = data;
+      saveAccounts();
+      showAuthMsg('注册成功，正在进入…', true);
+      setTimeout(function () { doLogin(name); }, 450);
+    } else {
+      if (!accounts[name]) { showAuthMsg('账号不存在'); return; }
+      if (accounts[name].pwd !== hashPwd(pwd)) { showAuthMsg('密码错误'); return; }
+      doLogin(name);
+    }
+  });
+
+  authPwdInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') authSubmit.click();
+  });
+  authUserInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') authPwdInput.focus();
+  });
+
+  function doLogin(name) {
+    pushUserData();
+    currentUser = name;
+    saveCurrent();
+    pullUserData();
+    refreshWallet();
+    updateTokenHUD();
+    renderShop();
+    renderInventory();
+    renderSkinShop();
+    renderHunterSkinGrid();
+    renderQuickBar();
+    loginScreen.classList.add('hide');
+    startScreen.classList.remove('hide');
+    sfx(660, 0.2, 0.06, 'sine', 990);
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', function () {
+    pushUserData();
+    currentUser = GUEST_ID;
+    saveCurrent();
+    pullUserData();
+    refreshWallet();
+    updateTokenHUD();
+    renderShop();
+    renderInventory();
+    renderSkinShop();
+    renderHunterSkinGrid();
+    renderQuickBar();
+    sfx(330, 0.2, 0.05, 'sine', 220);
+  });
+
+  /* ===================== 排行榜 ===================== */
+  document.getElementById('rankTabs').addEventListener('click', function (e) {
+    const btn = e.target.closest('.rank-tab');
+    if (!btn) return;
+    const tab = btn.dataset.rankTab;
+    if (tab === rankTab) return;
+    rankTab = tab;
+    document.querySelectorAll('#rankTabs .rank-tab').forEach(function (b) {
+      b.classList.toggle('active', b === btn);
+    });
+    renderRank();
+    sfx(560, 0.09, 0.035, 'sine');
+  });
+
+  function renderRank() {
+    const list = document.getElementById('rankList');
+    const entries = [];
+
+    if (rankTab === 'hunt') {
+      // 追猎榜：按 bestHunt 分
+      Object.keys(accounts).forEach(function (name) {
+        const u = accounts[name];
+        if (!u.bestHunt || u.bestHunt <= 0) return;
+        const ic = ICONS.find(function (x) { return x.id === u.icon; }) || ICONS[0];
+        const isGuest = name === GUEST_ID;
+        entries.push({
+          name: isGuest ? '游客' : name,
+          icon: ic.emoji,
+          value: u.bestHunt,
+          isMe: name === currentUser,
+          isGuest: isGuest
+        });
+      });
+      ONLINE_PLAYERS.forEach(function (p) {
+        if (p.bestHunt && p.bestHunt > 0) {
+          entries.push({
+            name: p.name, icon: p.icon, value: p.bestHunt,
+            isMe: false, isGuest: false
+          });
+        }
+      });
+      entries.sort(function (a, b) { return b.value - a.value; });
+
+      if (!entries.length) {
+        list.innerHTML = '<div class="history-empty">还没有追猎成绩</div>';
+        return;
+      }
+
+      let html = '';
+      for (let i = 0; i < entries.length; i++) {
+        const e = entries[i];
+        let nameHtml = e.name;
+        if (e.isMe) nameHtml += '<span class="you">你</span>';
+        else if (e.isGuest) nameHtml += '<span class="guest-tag">游客</span>';
+        html +=
+          '<div class="rank-item hunt-rank' + (e.isMe ? ' me' : '') + '" style="animation-delay:' + (i * 0.03) + 's">' +
+            '<span class="ri-num">' + (i + 1) + '</span>' +
+            '<span class="ri-icon">' + e.icon + '</span>' +
+            '<span class="ri-info">' +
+              '<span class="ri-name">' + nameHtml + '</span>' +
+              '<span class="ri-diff">追猎 · 最高分</span>' +
+            '</span>' +
+            '<span class="ri-time">' + e.value + '<span>分</span></span>' +
+          '</div>';
+      }
+      list.innerHTML = html;
+    } else {
+      // 生存榜：按 best 秒
+      Object.keys(accounts).forEach(function (name) {
+        const u = accounts[name];
+        if (!u.best || u.best <= 0) return;
+        const ic = ICONS.find(function (x) { return x.id === u.icon; }) || ICONS[0];
+        let diffName = '标准';
+        if (u.diff && DIFFS[u.diff]) diffName = DIFFS[u.diff].name;
+        const isGuest = name === GUEST_ID;
+        entries.push({
+          name: isGuest ? '游客' : name,
+          icon: ic.emoji,
+          value: u.best,
+          diff: diffName,
+          isMe: name === currentUser,
+          isGuest: isGuest
+        });
+      });
+      ONLINE_PLAYERS.forEach(function (p) {
+        if (p.best && p.best > 0) {
+          entries.push({
+            name: p.name, icon: p.icon, value: p.best,
+            diff: p.diff, isMe: false, isGuest: false
+          });
+        }
+      });
+      entries.sort(function (a, b) { return b.value - a.value; });
+
+      if (!entries.length) {
+        list.innerHTML = '<div class="history-empty">还没有生存成绩</div>';
+        return;
+      }
+
+      let html = '';
+      for (let i = 0; i < entries.length; i++) {
+        const e = entries[i];
+        let nameHtml = e.name;
+        if (e.isMe) nameHtml += '<span class="you">你</span>';
+        else if (e.isGuest) nameHtml += '<span class="guest-tag">游客</span>';
+        html +=
+          '<div class="rank-item' + (e.isMe ? ' me' : '') + '" style="animation-delay:' + (i * 0.03) + 's">' +
+            '<span class="ri-num">' + (i + 1) + '</span>' +
+            '<span class="ri-icon">' + e.icon + '</span>' +
+            '<span class="ri-info">' +
+              '<span class="ri-name">' + nameHtml + '</span>' +
+              '<span class="ri-diff">' + (e.diff || '标准') + '</span>' +
+            '</span>' +
+            '<span class="ri-time">' + e.value.toFixed(1) + '<span>s</span></span>' +
+          '</div>';
+      }
+      list.innerHTML = html;
+    }
+  }
+
+  document.getElementById('leaderboardBtn').addEventListener('click', function () {
+    closeMenu();
+    rankTab = 'survive';
+    document.querySelectorAll('#rankTabs .rank-tab').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.rankTab === 'survive');
+    });
+    renderRank();
+    startScreen.classList.add('hide');
+    rankScreen.classList.remove('hide');
+    sfx(600, 0.12, 0.04, 'sine', 780);
+  });
+  document.getElementById('closeRankBtn').addEventListener('click', function () {
+    rankScreen.classList.add('hide');
+    startScreen.classList.remove('hide');
+    sfx(440, 0.12, 0.04, 'sine', 330);
+  });
+
+  /* ===================== 匹配 ===================== */
+  const matchLoading = document.getElementById('matchLoading');
+  const matchResult  = document.getElementById('matchResult');
+  let pendingOpponent = null;
+
+  document.getElementById('matchBtn').addEventListener('click', function () {
+    closeMenu();
+    startScreen.classList.add('hide');
+    matchScreen.classList.remove('hide');
+    matchLoading.classList.remove('hide');
+    matchResult.classList.add('hide');
+    sfx(600, 0.12, 0.04, 'sine', 780);
+
+    setTimeout(function () {
+      const pool = ONLINE_PLAYERS.slice();
+      const op = pool[Math.floor(Math.random() * pool.length)];
+      let target;
+      const isNightmare = chosenDiff === 'nightmare';
+      const isChill = chosenDiff === 'chill';
+      const base = Math.min(op.best, 120) * 0.55;
+      if (isChill) target = base * 0.7;
+      else if (isNightmare) target = base * 0.85;
+      else target = base;
+      target = Math.max(12, Math.min(90, target));
+      target = Math.round(target * 10) / 10;
+      pendingOpponent = { name: op.name, icon: op.icon, target: target };
+      document.getElementById('matchMyAvatar').textContent = chosenIcon.emoji;
+      document.getElementById('matchMyName').textContent = currentUser === GUEST_ID ? '游客' : currentUser;
+      document.getElementById('matchOpAvatar').textContent = op.icon;
+      document.getElementById('matchOpName').textContent = op.name;
+      document.getElementById('matchTargetVal').textContent = target.toFixed(1) + 's';
+      matchLoading.classList.add('hide');
+      matchResult.classList.remove('hide');
+      sfx(880, 0.25, 0.07, 'sine', 1320);
+    }, 1900);
+  });
+
+  document.getElementById('matchCancelBtn').addEventListener('click', function () {
+    pendingOpponent = null;
+    matchScreen.classList.add('hide');
+    startScreen.classList.remove('hide');
+    sfx(440, 0.12, 0.04, 'sine', 330);
+  });
+
+  document.getElementById('matchStartBtn').addEventListener('click', function () {
+    if (!pendingOpponent) return;
+    matchOpponent = pendingOpponent;
+    pendingOpponent = null;
+    matchScreen.classList.add('hide');
+    startGame();
+  });
+
+  /* ===================== 暂停 / 主页 ===================== */
+  function pauseGame() {
+    if (!game || !game.running || game.over || paused) return;
+    if (menuOpen) closeMenu();
+    paused = true;
+    pauseScreen.classList.remove('hide');
+    sfx(440, 0.12, 0.04, 'sine', 520);
+  }
+  function resumeGame() {
+    if (!paused) return;
+    paused = false;
+    pausedByMenu = false;
+    last = 0;
+    pauseScreen.classList.add('hide');
+    sfx(660, 0.12, 0.04, 'sine', 880);
+  }
+
+  function goHome() {
+    pushUserData();
+    paused = false;
+    pausedByMenu = false;
+    closeMenu();
+    game = null;
+    matchOpponent = null;
+    quickBarEl.classList.remove('show');
+    pauseScreen.classList.add('hide');
+    endScreen.classList.add('hide');
+    historyScreen.classList.add('hide');
+    loginScreen.classList.add('hide');
+    rankScreen.classList.add('hide');
+    matchScreen.classList.add('hide');
+    skinShopScreen.classList.add('hide');
+    startScreen.classList.remove('hide');
+
+    surviveHud.style.display = 'none';
+    huntHud.classList.remove('show');
+
+    timeEl.innerHTML = '0.0<span>s</span>';
+    echoEl.textContent = '0';
+    enemyEl.textContent = '0';
+    matchTargetHud.classList.remove('show');
+    updateTokenHUD();
+    hudTimer = 0;
+    last = 0;
+    refreshWallet();
+    renderHunterSkinGrid();
+    sfx(330, 0.2, 0.05, 'sine', 220);
+  }
+
+  function restartNow() {
+    pushUserData();
+    paused = false;
+    pausedByMenu = false;
+    closeMenu();
+    pauseScreen.classList.add('hide');
+    endScreen.classList.add('hide');
+    startScreen.classList.add('hide');
+    historyScreen.classList.add('hide');
+    rankScreen.classList.add('hide');
+    matchScreen.classList.add('hide');
+    skinShopScreen.classList.add('hide');
+
+    const isHunt = gameMode === 'hunt';
+    surviveHud.style.display = isHunt ? 'none' : '';
+    huntHud.classList.toggle('show', isHunt);
+
+    game = isHunt ? newHuntGame() : newGame();
+    timeEl.innerHTML = '0.0<span>s</span>';
+    echoEl.textContent = '0';
+    enemyEl.textContent = '0';
+    huntTimeEl.innerHTML = HUNT_TIME_MAX.toFixed(1) + '<span>s</span>';
+    huntTimeEl.classList.remove('low');
+    huntCatchEl.textContent = '0';
+    huntComboEl.textContent = '×1';
+    huntScoreEl.textContent = '0';
+    updateTokenHUD();
+    hudTimer = 0;
+    last = 0;
+    renderInventory();
+    renderQuickBar();
+    sfx(520, 0.18, 0.05, 'sine', 880);
+  }
+
+  document.getElementById('pauseBtn').addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (menuOpen) { closeMenu(); return; }
+    if (paused) resumeGame();
+    else pauseGame();
+  });
+
+  document.getElementById('resumeBtn').addEventListener('click', resumeGame);
+  document.getElementById('restartPauseBtn').addEventListener('click', restartNow);
+  document.getElementById('homeBtn').addEventListener('click', goHome);
+  document.getElementById('homeBtn2').addEventListener('click', goHome);
+  document.getElementById('againBtn').addEventListener('click', restartNow);
+
+  document.getElementById('historyBtn').addEventListener('click', function () {
+    histTab = 'survive';
+    document.querySelectorAll('#histTabs .rank-tab').forEach(function (b) {
+      b.classList.toggle('active', b.dataset.histTab === 'survive');
+    });
+    renderHistory();
+    startScreen.classList.add('hide');
+    historyScreen.classList.remove('hide');
+    sfx(600, 0.12, 0.04, 'sine', 780);
+  });
+  document.getElementById('closeHistoryBtn').addEventListener('click', function () {
+    historyScreen.classList.add('hide');
+    startScreen.classList.remove('hide');
+    refreshWallet();
+    sfx(440, 0.12, 0.04, 'sine', 330);
+  });
+
+  document.getElementById('histTabs').addEventListener('click', function (e) {
+    const btn = e.target.closest('.rank-tab');
+    if (!btn) return;
+    const tab = btn.dataset.histTab;
+    if (tab === histTab) return;
+    histTab = tab;
+    document.querySelectorAll('#histTabs .rank-tab').forEach(function (b) {
+      b.classList.toggle('active', b === btn);
+    });
+    renderHistory();
+    sfx(560, 0.09, 0.035, 'sine');
+  });
+
+  window.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      if (!loginScreen.classList.contains('hide')) { document.getElementById('closeLoginBtn').click(); return; }
+      if (!skinShopScreen.classList.contains('hide')) { closeSkinShop(); return; }
+      if (!rankScreen.classList.contains('hide')) { document.getElementById('closeRankBtn').click(); return; }
+      if (!matchScreen.classList.contains('hide')) { document.getElementById('matchCancelBtn').click(); return; }
+      if (!historyScreen.classList.contains('hide')) { document.getElementById('closeHistoryBtn').click(); return; }
+      if (menuOpen) { closeMenu(); return; }
+      if (paused) resumeGame();
+      else pauseGame();
+      return;
+    }
+    if (e.key === 'm' || e.key === 'M') {
+      if (loginScreen.classList.contains('hide') && rankScreen.classList.contains('hide') &&
+          matchScreen.classList.contains('hide') && skinShopScreen.classList.contains('hide')) {
+        if (menuOpen) closeMenu();
+        else openMenu();
+      }
+      return;
+    }
+    if (e.key === 'p' || e.key === 'P') {
+      if (menuOpen) return;
+      if (paused) resumeGame();
+      else pauseGame();
+    }
+    if (e.key === '1') setTheme('dark');
+    if (e.key === '2') setTheme('light');
+    if (e.key === '3') setTheme('gray');
+  });
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden && !menuOpen) pauseGame();
+  });
+
+  /* ===================== 历史成绩（按标签过滤） ===================== */
+  function renderHistory() {
+    let filtered;
+    if (histTab === 'survive') {
+      filtered = history.filter(function (h) { return h.mode === 'survive' || !h.mode; });
+    } else if (histTab === 'hunt') {
+      filtered = history.filter(function (h) { return h.mode === 'hunt'; });
+    } else {
+      filtered = history;
+    }
+
+    if (!filtered.length) {
+      historyListEl.innerHTML = '<div class="history-empty">还没有记录<br>开始一局游戏吧</div>';
+      return;
+    }
+
+    let html = '';
+    for (let i = 0; i < filtered.length; i++) {
+      const h = filtered[i];
+      const isHunt = h.mode === 'hunt';
+
+      if (isHunt) {
+        html +=
+          '<div class="history-item hunt-hist" style="animation-delay:' + (i * 0.035) + 's">' +
+            '<span class="hi-icon">' + (h.icon || '⭐') + '</span>' +
+            '<span class="hi-info">' +
+              '<span class="hi-diff hunt">追猎 · 捕获 ' + (h.catches || 0) + '</span>' +
+            '</span>' +
+            '<span class="hi-time">' + (h.score || 0) + '<span>分</span></span>' +
+          '</div>';
+      } else {
+        const tk = h.tokens > 0
+          ? '<span class="hi-token">替身 × ' + h.tokens + '</span>'
+          : '<span class="hi-token" style="color:var(--c-text-sub)">未用替身</span>';
+        html +=
+          '<div class="history-item" style="animation-delay:' + (i * 0.035) + 's">' +
+            '<span class="hi-icon">' + (h.icon || '⭐') + '</span>' +
+            '<span class="hi-info">' +
+              '<span class="hi-diff">' + (h.diff || '标准') + '</span>' +
+              tk +
+            '</span>' +
+            '<span class="hi-time">' + h.t.toFixed(1) + '<span>s</span></span>' +
+          '</div>';
+      }
+    }
+    historyListEl.innerHTML = html;
+  }
+
+  /* ===================== 角色 / 难度 ===================== */
+  const iconGrid = document.getElementById('iconGrid');
+  ICONS.forEach(function (ic, i) {
+    const btn = document.createElement('button');
+    btn.className = 'icon-btn' + (i === 0 ? ' active' : '');
+    btn.textContent = ic.emoji;
+    btn.title = ic.name;
+    btn.dataset.icon = ic.id;
+    btn.addEventListener('click', function () {
+      chosenIcon = ic;
+      const all = iconGrid.querySelectorAll('.icon-btn');
+      for (let k = 0; k < all.length; k++) all[k].classList.remove('active');
+      btn.classList.add('active');
+      pushUserData();
+      refreshWallet();
+      sfx(720 + i * 40, 0.09, 0.035, 'sine');
+    });
+    iconGrid.appendChild(btn);
+  });
+
+  function renderIconGridActive() {
+    const all = iconGrid.querySelectorAll('.icon-btn');
+    for (let k = 0; k < all.length; k++) {
+      all[k].classList.toggle('active', all[k].dataset.icon === chosenIcon.id);
+    }
+  }
+
+  const diffRow = document.getElementById('diffRow');
+  diffRow.addEventListener('click', function (e) {
+    const btn = e.target.closest('.diff-btn');
+    if (!btn) return;
+    chosenDiff = btn.dataset.diff;
+    const all = diffRow.querySelectorAll('.diff-btn');
+    for (let k = 0; k < all.length; k++) all[k].classList.remove('active');
+    btn.classList.add('active');
+    pushUserData();
+    sfx(520, 0.1, 0.04, 'triangle');
+  });
+
+  function renderDiffActive() {
+    const all = diffRow.querySelectorAll('.diff-btn');
+    for (let k = 0; k < all.length; k++) {
+      all[k].classList.toggle('active', all[k].dataset.diff === chosenDiff);
+    }
+  }
+
+  /* ===================== 开始游戏 ===================== */
+  function startGame() {
+    initAudio();
+    if (actx && actx.state === 'suspended') actx.resume();
+
+    paused = false;
+    pausedByMenu = false;
+    closeMenu();
+    startScreen.classList.add('hide');
+    endScreen.classList.add('hide');
+    pauseScreen.classList.add('hide');
+    historyScreen.classList.add('hide');
+    loginScreen.classList.add('hide');
+    rankScreen.classList.add('hide');
+    matchScreen.classList.add('hide');
+    skinShopScreen.classList.add('hide');
+
+    const isHunt = gameMode === 'hunt';
+    surviveHud.style.display = isHunt ? 'none' : '';
+    huntHud.classList.toggle('show', isHunt);
+
+    game = isHunt ? newHuntGame() : newGame();
+
+    if (isHunt) {
+      huntTimeEl.innerHTML = HUNT_TIME_MAX.toFixed(1) + '<span>s</span>';
+      huntTimeEl.classList.remove('low');
+      huntCatchEl.textContent = '0';
+      huntComboEl.textContent = '×1';
+      huntScoreEl.textContent = '0';
+    } else {
+      timeEl.innerHTML = '0.0<span>s</span>';
+      echoEl.textContent = '0';
+      enemyEl.textContent = '0';
+    }
+
+    updateTokenHUD();
+    hudTimer = 0;
+    last = 0;
+    renderInventory();
+    renderQuickBar();
+    sfx(520, 0.18, 0.05, 'sine', 880);
+  }
+
+  document.getElementById('startBtn').addEventListener('click', function () {
+    matchOpponent = null;
+    startGame();
+  });
+
+  /* ===================== 启动 ===================== */
+  loadTheme();
+  loadAccounts();
+  pullUserData();
+  resize();
+  refreshWallet();
+  updateTokenHUD();
+  renderShop();
+  renderInventory();
+  renderSkinShop();
+  renderHunterSkinGrid();
+  updateSkinSectionVisibility();
+  updateBestDisplays();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
